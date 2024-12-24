@@ -27,8 +27,6 @@
 	"dependencies": {
 		"emailjs": "^4.0.3",
 		"nodemailer": "^6.9.8",
-		"rollup": "^4.6.1",
-		"@rollup/rollup-linux-x64-gnu": "4.6.1",
 		"svelte-codemirror-editor": "^1.4.1",
 		"@codemirror/lang-javascript": "github:codemirror/lang-javascript"
 	},
