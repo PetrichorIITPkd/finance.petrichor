@@ -1,7 +1,7 @@
 import type { Data, Vtransaction } from "./types"
 
-// export const backend_url = "http://127.0.0.1:8000/"
-export const backend_url = 'https://petri-back.vercel.app/'
+export const backend_url = "http://127.0.0.1:8000/"
+// export const backend_url = 'https://petri-back.vercel.app/'
 // export const backend_url = 'https://petrichor-backend.vercel.app/'
 
 export let API = {
