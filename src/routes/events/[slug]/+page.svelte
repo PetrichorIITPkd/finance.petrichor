@@ -3,7 +3,6 @@
     import type { Event } from "$lib/types";
 
     export let data: any;
-console.log(data.pass);
     let events: Event[] = data.data;
     let markdown= "Start the Markdown here"
     function changeMarkdown(e) {
