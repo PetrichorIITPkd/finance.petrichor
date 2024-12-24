@@ -24,12 +24,9 @@
 	"type": "module",
 	"dependencies": {
 		"@codemirror/lang-javascript": "github:codemirror/lang-javascript",
-		"@rollup/browser": "^4.29.1",
-		"codemirror": "^6.0.1",
+		"@sveltejs/adapter-auto": "^3.3.1",
 		"emailjs": "^4.0.3",
 		"nodemailer": "^6.9.8",
-		"rollup": "^1.19.4",
-		"rollup-plugin-svelte": "^5.1.0",
 		"svelte-codemirror-editor": "^1.4.1"
 	}
 }
