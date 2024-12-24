@@ -5,6 +5,7 @@ import { API, POST } from '$lib';
 
 export const load: PageServerLoad = async ({ params }) => {
 	// if (params.slug != process.env.pass){
+	console.log(process.env.pass)
 	if (params.slug != process.env.pass){
         throw error(404, {message: 'Wrong Password'})
     }
