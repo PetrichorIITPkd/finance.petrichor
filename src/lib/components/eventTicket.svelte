@@ -1,35 +1,20 @@
-<script>
-    let events = [];
+<script lang="ts">
+    import { goto } from "$app/navigation";
+
+    export let events: Event[]  = [];
+    export let pass:string = "";
 
     function addEvent() {
-        const newEvent = {
-            id: 45123,
-            name: "Sample Event",
-            minMembers: 5,
-            maxMembers: 20,
-            isTeam: "Yes",
-        };
-        events = [...events, newEvent];
+        goto(`/events/${pass}/new`)
     }
 </script>
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        background-color: #f9f9f9;
-        min-height: 100vh;
-    }
 
     .container {
-        width: 60%;
-        max-width: 1200px;
-        margin: 20px auto;
-        padding: 20px;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 10px;
         background-color: #ffffff;
         border: 1px solid #ccc;
         border-radius: 8px;
@@ -62,24 +47,32 @@
     .event-list {
         display: flex;
         flex-wrap: wrap;
-        gap: 20px;
+        gap: 10px;
     }
 
     .event-block {
-        width: 30%;
         background-color: #f4f4f4;
         border: 1px solid #ddd;
         border-radius: 8px;
         padding: 15px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         display: flex;
+        cursor: pointer;
+        text-overflow: ellipsis;
         flex-direction: column;
+        overflow: hidden;
         gap: 10px;
     }
 
     .event-block span {
         font-size: 14px;
         font-weight: bold;
+    }
+
+    @media (max-width: 700px) {
+        .event-list {
+            flex-direction: column;
+        }
     }
 </style>
 
@@ -90,12 +83,9 @@
 
     <div class="event-list">
         {#each events as event}
-            <div class="event-block">
-                <span>Event ID: {event.id}</span>
+            <div class="event-block" on:click={() => goto(`/events/${pass}/${event.eventId}`)}>
+                <span>Event ID: {event.eventId}</span>
                 <span>Name: {event.name}</span>
-                <span>Min Members: {event.minMembers}</span>
-                <span>Max Members: {event.maxMembers}</span>
-                <span>Is Team Event: {event.isTeam}</span>
             </div>
         {/each}
     </div>

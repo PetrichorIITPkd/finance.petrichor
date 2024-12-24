@@ -4,11 +4,12 @@ import type { PageServerLoad } from './$types';
 import { API, POST } from '$lib';
 
 export const load: PageServerLoad = async ({ params }) => {
-	if (params.slug != process.env.pass){
-        throw error(404, {message: 'Wrong Password'})
-    }
+	// if (params.slug != process.env.pass){
+    //     throw error(404, {message: 'Wrong Password'})
+    // }
 	const res = await POST(API.allEvents,{
-        "password":process.env.pass
+        // "password":process.env.pass
+        "password":"joPcyq-kipwyc-2jygva"
     })
     const result = await res.json()
     if (result.status != 200){
