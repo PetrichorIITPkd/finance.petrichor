@@ -12,11 +12,11 @@
 
 <main>
     <div class="updateArea">
-        <button on:click={()=> {goto(`/events/p/new`)}}> Add New </button>   
+        <button on:click={()=> {goto(`/events/${data.pass}/new`)}}> Add New </button>   
     </div>
     <div class="readmeArea">
         {#each events as event}
-            <div on:click={()=>{goto(`/events/p/${event.eventId}`)}}>{event.name}</div>
+            <div on:click={()=>{goto(`/events/${data.pass}/${event.eventId}`)}}>{event.name}</div>
         {/each}
     </div>
 </main>

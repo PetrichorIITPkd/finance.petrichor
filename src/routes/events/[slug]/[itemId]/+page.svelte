@@ -105,16 +105,16 @@
 				if (rdata.success){
 					displayPopUp(
 						"Message",
-						"Password Reset Successful",
+						"Event Updated successfully",
 						3000,
-						()=>{}
+						()=>{goto(`/events/${data.pass}/`)}
 					)
 				}else{
 					displayPopUp(
 						"Alert",
 						rdata.message ?? "Some Error encountered",
 						4000,
-						()=>{goto("/events/p/")}
+						()=>{goto(`/events/${data.pass}/`)}
 					)
 				}
 			}else{
@@ -132,6 +132,7 @@
     }
 
 </script>
+
 
 <main>
     <h1 style="margin-left: 10px;">Event {(data.type == "new" ? "Create" :"Update")}</h1>
@@ -194,6 +195,8 @@
     </div>
     <p style="margin-left: 10px;">Output Updates every second</p>
 </main>
+
+
 
 <style>
     main {

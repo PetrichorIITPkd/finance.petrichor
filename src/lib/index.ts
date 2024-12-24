@@ -10,6 +10,16 @@ export let API = {
     getEvent: `${backend_url}/internal/event/`,
 }
 
+export const default_event = {
+    eventId: "TP99",
+    name: "Name",
+    minMember: 1,
+    maxMember: 1,
+    isTeam: false,
+    fee: 0,
+    markdown: ""
+}
+
 export async function POST(url: string, body: any) {
     return await fetch(url, {
         method: 'POST',

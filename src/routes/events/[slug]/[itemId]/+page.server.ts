@@ -3,40 +3,35 @@
 
 import * as rollup from "rollup/dist/rollup.browser.es.js"
 import type { Component } from '$lib/types';
-import { API, POST, pre_components } from '$lib';
+import { API, default_event, POST, pre_components } from '$lib';
 import {compile} from  "svelte/compiler";
 import { compile as mdcompile } from "mdsvex"
 
 import type { PageServerLoad } from './$types';
-import { error } from 'console';
-import { fail } from '@sveltejs/kit';
+import { fail, error } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params }) => {
+    if (params.slug != process.env.pass) {
+        throw error(404, {message: "Wrong Password"})
+    }
     if (params.itemId === "new") {
         return {
-            "event": {
-                eventId: "TP99",
-                name: "Name",
-                minMember: 1,
-                maxMember: 1,
-                isTeam: false,
-                fee: 0,
-                markdown: ""
-            },
+            "event": default_event,
             "type": "new"
         }
     }
-
+    
     const res = await POST(API.getEvent,{
         "id":params.itemId,
-        "password": "Petrichor" 
+        // "password": "Petrichor" 
+        "password": process.env.pass 
     })
     const result = await res.json()
     
     if (result.status != 200){
-        error(404, {message: 'Unable to resolve the response: ' + result.data})
+        throw error(404, {message: 'Unable to resolve the response: ' + result.message})
     }
-    return {event: result, "type": "old"}
+    return {event: result, "type": "old", "pass": params.slug}
 };   
 
 
@@ -173,7 +168,8 @@ export const actions = {
             "name": name,
             "isTeam": isTeam == "true",
             "markdown": markdown,
-            "password" : "Petrichor"
+            // "password" : "Petrichor"
+            "password" : process.env.pass
         })
         .then(res => res.json())
         .catch (err => {
