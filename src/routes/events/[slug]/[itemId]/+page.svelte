@@ -1,15 +1,25 @@
 <script lang="ts">
     import CodeMirror from "svelte-codemirror-editor";
     import { javascript } from "@codemirror/lang-javascript";
+    import { enhance } from "$app/forms";
+    import { getContext, onMount } from "svelte";
+    import { goto } from "$app/navigation";
 
     export let data: any;
+
+    let event = data.event
     let changed = false;
-    let prevTime = Date.now()
 
     let iframe:HTMLIFrameElement
     
-    let markdown = data.markdown;
+    let markdown = "";
     let transformed_code: string;
+
+    onMount(() => {
+        if (event) {
+            markdown = event.markdown
+        }
+    })
 
     function convertToHtml() {
         fetch("?/convert", {
@@ -80,11 +90,100 @@
     }
 
     $: iframe && transformed_code && update(transformed_code)
+
+
+    const displayPopUp:Function = getContext('displayPopUp')
+	const loading:Function = getContext('loading')
+
+    function handleUpdate() {
+        loading( true)
+        return async ({result}) => {
+            loading( false);
+			// console.log(result)
+			if (result.type == "success" && result.data){
+				const rdata = result.data
+				if (rdata.success){
+					displayPopUp(
+						"Message",
+						"Password Reset Successful",
+						3000,
+						()=>{}
+					)
+				}else{
+					displayPopUp(
+						"Alert",
+						rdata.message ?? "Some Error encountered",
+						4000,
+						()=>{goto("/events/p/")}
+					)
+				}
+			}else{
+				// console.log(result)
+				setTimeout(() => {
+					displayPopUp(
+						"Alert",
+						result.data.err ? result.data.err : "Unknown Error. Please contact the administration",
+						2000,
+						()=>{}
+					)
+				}, 100);
+			}
+        }
+    }
+
 </script>
 
 <main>
-    <div class="update Area">
+    <h1 style="margin-left: 10px;">Event {(data.type == "new" ? "Create" :"Update")}</h1>
+    <div class="update_Area">
         <!-- Geeteshwar's progress here -->
+         <form method="post" action="?/update" use:enhance={handleUpdate}>
+            <span>
+                <p>EventId</p>
+                <input name="eventId" type="text" value={event.eventId}/>
+
+            </span>
+            <span>
+                <p>Name</p>
+                <input name="name" type="text" value={event.name}/>
+            </span>
+            <span>
+                <p>fee</p>
+                <input name="fee" type="number" value={event.fee}/>
+            </span>
+            <span>
+                <p>MaxMember</p>
+                <input name="maxMember" type="number" value={event.maxMember}/>
+            </span>
+            <span>
+                <p>minMember</p>
+                <input name="minMember" type="number" value={event.minMember}/>
+            </span>
+            <input hidden name="markdown" value={markdown} />
+            <input hidden name="type" value={data.type} />
+            <span>
+                <p>isTeam</p>
+                <div>
+                    <label>
+                        <input
+                            name="isTeam"
+                            type="radio"
+                            value="true"
+                            checked={event.isTeam === true} />
+                        True
+                    </label>
+                    <label>
+                        <input
+                            name="isTeam"
+                            type="radio"
+                            value="false"
+                            checked={event.isTeam === false} />
+                        False
+                    </label>
+                </div>
+            </span>
+            <button type="submit">Update</button>
+         </form>
         <!-- <button on:click={convertToHtml}>Convert</button> -->
     </div>
     <div class="readmeArea">
@@ -93,7 +192,7 @@
         </div>
         <iframe class="outputArea" bind:this={iframe} title='repl' {srcdoc} height={height}/>
     </div>
-    <p>Output Updates every second</p>
+    <p style="margin-left: 10px;">Output Updates every second</p>
 </main>
 
 <style>
@@ -104,6 +203,9 @@
         position: relative;
         top: 0;
         left: 0;
+    }
+    .update_Area {
+        padding: 10px;
     }
     * {
         box-sizing: border-box;
@@ -122,6 +224,11 @@
         font-size: 16px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+
+    span {
+        display:  flex;
+        gap: 10px;
+    }
     .textareaElement:focus {
         color: #33363c;
     }
@@ -129,7 +236,10 @@
     .readmeArea {
         width: 100vw;
         display: flex;
+        border-top: 1px solid gray;
         align-items: center;
+        gap: 10px;
+        padding: 10px 10px;
         justify-content: center;
     }
     .outputArea {
@@ -139,12 +249,16 @@
         border-radius: 5px;
         min-height: 150px;
     }
-    @media (max-with: 900px) {
-        main {
-            display: flex;
-        }
+    @media (max-width: 720px) {
         .readmeArea {
             display: flex;
+            flex-direction: column;
+        }
+        .outputArea {
+            width: 100%;
+        }
+        .textareaElement {
+            width: 100%;
         }
     }
 </style>

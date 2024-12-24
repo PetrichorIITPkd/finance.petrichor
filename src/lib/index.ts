@@ -1,6 +1,14 @@
 import type { Data, Vtransaction } from "./types"
 
-export const backend_url = 'https://petrichor-backend.vercel.app/'
+export const backend_url = "http://127.0.0.1:8000/"
+// export const backend_url = 'https://petrichor-backend.vercel.app/'
+
+export let API = {
+    addEvent: `${backend_url}/internal/events/add/`,
+    updateEvent: `${backend_url}/internal/events/update/`,
+    allEvents: `${backend_url}/internal/events/all/`,
+    getEvent: `${backend_url}/internal/event/`,
+}
 
 export async function POST(url: string, body: any) {
     return await fetch(url, {

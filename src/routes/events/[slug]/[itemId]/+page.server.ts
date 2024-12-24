@@ -1,39 +1,42 @@
 // Credits : https://www.youtube.com/watch?v=vHHLLJA0b70&t=13141s
 
 
-import path from 'path';
-import fs from 'fs';
-
 import * as rollup from "rollup/dist/rollup.browser.es.js"
 import type { Component } from '$lib/types';
-import { pre_components } from '$lib';
+import { API, POST, pre_components } from '$lib';
 import {compile} from  "svelte/compiler";
 import { compile as mdcompile } from "mdsvex"
 
 import type { PageServerLoad } from './$types';
+import { error } from 'console';
+import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params }) => {
+    if (params.itemId === "new") {
+        return {
+            "event": {
+                eventId: "TP99",
+                name: "Name",
+                minMember: 1,
+                maxMember: 1,
+                isTeam: false,
+                fee: 0,
+                markdown: ""
+            },
+            "type": "new"
+        }
+    }
 
-
-    // const res = await POST(`${backend_url}internal/events/all/`,{
-    //     "id":params.itemId
-    // })
-    // const result = await res.json()
-    // if (result.status != 200){
-    //     error(404, {message: 'Unable to resolve the response'})
-    // }
-
-    // const markdown = fs.readFileSync(path.resolve('./src/routes/events/[slug]/[itemId]/+page.svx')).toString()
-    const markdown = "";
-    // return {data: result.data}
-    return {"event" : {
-        eventId: "TP01",
-        name: "Number",
-        minMember: 1,
-        maxMember: 1,
-        isTeam: true,
-        fee: 999
-    }, "markdown": markdown} 
+    const res = await POST(API.getEvent,{
+        "id":params.itemId,
+        "password": "Petrichor" 
+    })
+    const result = await res.json()
+    
+    if (result.status != 200){
+        error(404, {message: 'Unable to resolve the response: ' + result.data})
+    }
+    return {event: result, "type": "old"}
 };   
 
 
@@ -126,5 +129,59 @@ export const actions = {
         });
         const output: string = ( await bundle.generate({ format: 'esm' })).output[0].code;
         return output
+        },
+
+    update: async ({ request }) => {
+        let formData = await request.formData();
+
+        // Extracting fields from formData
+        const eventId = formData.get('eventId');
+        const name = formData.get('name');
+        const fee = formData.get('fee');
+        const maxMember = formData.get('maxMember');
+        const minMember = formData.get('minMember');
+        const isTeam = formData.get('isTeam');
+        const markdown = formData.get('markdown');
+
+        // Validation
+        if (!eventId || !name || !fee || !maxMember || !minMember || !isTeam) {
+            return fail(400, { message: 'All fields are required.' });
         }
+
+        if (isNaN(Number(fee))) {
+            return fail(400, { message: 'Fee must be a valid number.' });
+        }
+
+        if (isNaN(Number(maxMember)) || isNaN(Number(minMember))) {
+            return fail(400, { message: 'MaxMember and MinMember must be valid numbers.' });
+        }
+
+        if (!['true', 'false'].includes(isTeam.toString().toLowerCase())) {
+            return fail(400, { message: 'isTeam must be "true" or "false".' });
+        }
+
+        let url = API.updateEvent
+        if (formData.get('type') == "new") {
+            url = API.addEvent
+        }
+
+        const res= POST(url, {
+            "eventId": eventId,
+            "fee": fee,
+            "minMember": minMember,
+            "maxMember": maxMember,
+            "name": name,
+            "isTeam": isTeam == "true",
+            "markdown": markdown,
+            "password" : "Petrichor"
+        })
+        .then(res => res.json())
+        .catch (err => {
+            return fail(500, { message: 'Failed to fetch response' })
+        })
+        
+        return res
+    }
+
+    
 }

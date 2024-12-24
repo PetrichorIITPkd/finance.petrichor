@@ -11,10 +11,12 @@
 </script>
 
 <main>
-    <div class="update Area"></div>
+    <div class="updateArea">
+        <button on:click={()=> {goto(`/events/p/new`)}}> Add New </button>   
+    </div>
     <div class="readmeArea">
         {#each events as event}
-            <div on:click={()=>{goto(`/events/p/${event.eventId}`)}}>Event</div>
+            <div on:click={()=>{goto(`/events/p/${event.eventId}`)}}>{event.name}</div>
         {/each}
     </div>
 </main>
@@ -23,6 +25,16 @@
     main {
         width: 100vw;
         height: 100vh;
+    }
+    .updateArea button {
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+    }
+    .updateArea {
+        display: flex;
+        justify-content: center;
+        margin: 10px;
     }
     .textareaElement {
         overflow-x: hidden;
@@ -46,7 +58,15 @@
         width: 100vw;
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
         justify-content: center;
+    }
+    .readmeArea div {
+        border: #33363c 1px solid;
+        padding: 10px;
+        cursor:pointer;
+        background-color: #d9e3f8;
     }
     .outputArea {
         width: 50%;
