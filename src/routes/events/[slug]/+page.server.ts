@@ -15,5 +15,5 @@ export const load: PageServerLoad = async ({ params }) => {
     if (result.status != 200){
         throw error(404, {message: 'Unable to resolve the response. ' + result.message})
     }
-    return {data: result.data, "pass": params.slug}
+    return {data: result.data, "pass": params.slug }
 };
