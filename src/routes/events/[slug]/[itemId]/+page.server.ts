@@ -3,36 +3,38 @@
 
 import type { Component } from '$lib/types';
 import { API, default_event, POST, pre_components } from '$lib';
-import {compile} from  "svelte/compiler";
+import { compile } from "svelte/compiler";
 import { compile as mdcompile } from "mdsvex"
-import { rollup } from 'rollup';
-
+import fs from "fs";
+import { build } from 'esbuild';
 import type { PageServerLoad } from './$types';
 import { fail, error } from '@sveltejs/kit';
+import path from 'path';
 
 export const load: PageServerLoad = async ({ params }) => {
     if (params.slug != process.env.pass) {
-        throw error(404, {message: "Wrong Password"})
+        throw error(404, { message: "Wrong Password" })
     }
     if (params.itemId === "new") {
+        // default_event.markdown = fs.readFileSync(path.resolve('./src/routes/events/[slug]/[itemId]/_page.svx')).toString()
         return {
             "event": default_event,
             "type": "new"
         }
     }
-    
-    const res = await POST(API.getEvent,{
-        "id":params.itemId,
+
+    const res = await POST(API.getEvent, {
+        "id": params.itemId,
         // "password": "Petrichor" 
-        "password": process.env.pass 
+        "password": process.env.pass
     })
     const result = await res.json()
-    
-    if (result.status != 200){
-        throw error(404, {message: 'Unable to resolve the response: ' + result.message})
+
+    if (result.status != 200) {
+        throw error(404, { message: 'Unable to resolve the response: ' + result.message })
     }
-    return {event: result, "type": "old", "pass": params.slug}
-};   
+    return { event: result, "type": "old", "pass": params.slug }
+};
 
 
 const CDN_URL = "https://cdn.jsdelivr.net/npm";
@@ -56,77 +58,73 @@ async function fetch_package(url: string): Promise<string> {
 export const actions = {
     convert: async ({ request }) => {
         const markdown = await request.text();
-        // console.log(markdown)
-        generate_lookup([...pre_components, {
-            id: 100,
-            name: 'markdown',
-            source: markdown,
-            type: 'mdx'
-        }])
-        const bundle = await rollup({
-            input: "./markdown.mdx",
-            plugins: [
-                {
-                    name: 'repl-plugin',
-                    resolveId(this, importee: string, importer?: string, options?: { 
-                        attributes: Record<string, string>; 
-                        custom?: CustomPluginOptions; 
-                        isEntry: boolean; 
-                    }) {
-                        // Handle imports from 'svelte'
-                        if (importer === "./Component.svelte") {
-                            if (importee.endsWith("disclose-version")) return "";
-                            console.log(importee);
+        generate_lookup([
+            ...pre_components,
+            {
+                id: 100,
+                name: 'markdown',
+                source: markdown,
+                type: 'mdx',
+            },
+        ]);
+
+        const plugins = [
+            {
+                name: 'esbuild-plugin',
+                setup(build) {
+                    build.onResolve({ filter: /.*/ }, (args) => {
+                        // console.log("J", args)
+                        if (args.path === 'svelte') {
+                            return { path: `${CDN_URL}/svelte/index.mjs`, namespace: 'cdn' };
                         }
-                        if (importee === 'svelte') return `${CDN_URL}/svelte/index.mjs`;
-        
-                        if (importee.startsWith('svelte/')) {
-                            return `${CDN_URL}/svelte/${importee.slice(7)}/index.mjs`;
+                        if (args.path.startsWith('svelte/')) {
+                            return { path: `${CDN_URL}/svelte/${args.path.slice(7)}/index.mjs`, namespace: 'cdn' };
                         }
-        
-                        // Handle relative imports for Svelte components
-                        if (components_map.has(importee)) return importee;
-        
-                        // Handle imports from the CDN
-                        if (importer && importer.startsWith(CDN_URL)) {
-                            const resolved = new URL(importee, importer).href;
-                            return resolved.endsWith('.mjs') ? resolved : `${resolved}/index.mjs`;
+                        // console.log("bye")
+                        if (components_map.has(args.path)) {
+                            return { path: args.path, namespace: 'components' };
                         }
-        
-                        return null; // Other cases are left to Rollup
-                    },
-                    async load(this, id: string) {
-                        if (components_map.has(id)) {
-                            return components_map.get(id)?.source; // Return component source code
+                        return null;
+                    });
+
+                    build.onLoad({ filter: /.*/, namespace: 'components' }, async (args) => {
+                        // console.log("resolved", args)
+                        const component = components_map.get(args.path);
+                        if (component?.type == "mdx") {
+                            // console.log("ll", args)
+                            const source = components_map.get(args.path)?.source || '';
+                            const mkCompiled = await mdcompile(source, {});
+                            // console.log("Here------")
+                            const compiled = compile(mkCompiled.code, { generate: 'dom' });
+                            const finalCode = compiled.js.code.replace('import "svelte/internal/disclose-version";', '');
+                            return { contents: finalCode, loader: 'js' };
+                        } else {
+                            const source = components_map.get(args.path)?.source || '';
+                            const compiled = compile(source, { generate: 'dom' });
+                            const finalCode = compiled.js.code.replace('import "svelte/internal/disclose-version";', '');
+                            return { contents: finalCode, loader: 'js' };
                         }
-                        return await fetch_package(id); // Fetch from the CDN
-                    },
-                    async transform(this, code: string, id: string) {
-                        if (id.endsWith('.svelte')) {
-                            // Compile Svelte to JavaScript
-                            const compiled = compile(code, {
-                                generate: 'dom'
-                            });
-                            const final_code = compiled.js.code.replace("import \"svelte/internal/disclose-version\";", "\n");
-                            return final_code;
-                        }
-                        if (id.endsWith('.mdx')) {
-                            const mk_compiled = await mdcompile(code, {});
-                            const compiled = compile(mk_compiled?.code, {
-                                generate: 'dom'
-                            });
-                            const final_code = compiled.js.code.replace("import \"svelte/internal/disclose-version\";", "\n");
-                            return final_code;
-                        }
-                        return null; // Pass other files unchanged
-                    },
+                        // return { contents: component?.source, namespace: component?.type };
+                    });
+
+                    build.onLoad({ filter: /.*/, namespace: 'cdn' }, async (args) => {
+                        const response = await fetch(args.path);
+                        return { contents: await response.text() };
+                    });
                 },
-            ]
+            },
+        ];
+
+        const result = await build({
+            entryPoints: ['./markdown.mdx'],
+            bundle: true,
+            format: 'esm',
+            plugins,
+            write: false,
         });
-       
-        const output: string = ( await bundle.generate({ format: 'esm' })).output[0].code;
-        return output
-        },
+
+        return result.outputFiles[0].text;
+    },
 
     update: async ({ request }) => {
         let formData = await request.formData();
@@ -162,7 +160,7 @@ export const actions = {
             url = API.addEvent
         }
 
-        const res= POST(url, {
+        const res = POST(url, {
             "eventId": eventId,
             "fee": fee,
             "minMember": minMember,
@@ -171,15 +169,15 @@ export const actions = {
             "isTeam": isTeam == "true",
             "markdown": markdown,
             // "password" : "Petrichor"
-            "password" : process.env.pass
+            "password": process.env.pass
         })
-        .then(res => res.json())
-        .catch (err => {
-            return fail(500, { message: 'Failed to fetch response' })
-        })
-        
+            .then(res => res.json())
+            .catch(err => {
+                return fail(500, { message: 'Failed to fetch response' })
+            })
+
         return res
     }
 
-    
+
 }
