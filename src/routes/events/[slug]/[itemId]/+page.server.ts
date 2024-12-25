@@ -243,6 +243,10 @@ export const actions = {
             .then(res => res.json())
             .then(res => {
                 if (res.status == 200) {
+                    
+                    fs.mkdirSync("./static/uploads", {
+                        recursive:true
+                    })
                     for (const buffer_entry of organizers_buffer.entries()){
                         const [name, buffer_data] = buffer_entry
                         const {buffer, old_name } = buffer_data
