@@ -6,10 +6,8 @@ import { API, default_event, events, POST, pre_components } from '$lib';
 import { compile } from "svelte/compiler";
 import { compile as mdcompile } from "mdsvex"
 import { build } from 'esbuild';
-import fs from "fs";
 import type { PageServerLoad } from './$types';
 import { fail, error } from '@sveltejs/kit';
-import path from 'path';
 
 export const load: PageServerLoad = async ({ params, url }) => {
     if (params.slug != process.env.pass) {
@@ -197,22 +195,27 @@ export const actions = {
                     return fail(404, { message: 'Duplicate Organizer name'});
                 }
 
-                if (!key.endsWith("new") && file.name == "" ) {
+                if (!key.endsWith("new") ) {
                     const old_name = previous_organizers[key]
-                    organizers_buffer.set(name, {
-                        "buffer": "",
-                        "old_name": old_name
-                    })
-                    if (!( fs.existsSync(path.resolve(`./static/uploads/`, `${old_name.toLowerCase()}.png`))) ) {
-                        return fail(404, { message: `${old_name}'s image does not exists with us. Please reupload.`});
+                    if (file.name == "") {
+                        organizers_buffer.set(name, {
+                            "buffer": "",
+                            "old_name": old_name
+                        })
+                    } else if (to_overwrite){
+                        const buffer = Buffer.from(await file.arrayBuffer());
+                        organizers_buffer.set(name, {
+                            "buffer": buffer,
+                            "old_name": old_name
+                        })
+                    } else {
+                        organizers_buffer.set(name, {
+                            "buffer": "",
+                            "old_name": name
+                        })
                     }
                 }
-                else if (( fs.existsSync(path.resolve(`./static/uploads/`, `${name.toLowerCase()}.png`))) && !to_overwrite ) {
-                    organizers_buffer.set(name, {
-                        "buffer": "",
-                        "old_name": name
-                    })
-                } else {
+                else {
                     // Convert the file to a buffer and save it
                     const buffer = Buffer.from(await file.arrayBuffer());
                     organizers_buffer.set(name,{
@@ -228,6 +231,7 @@ export const actions = {
             url = API.addEvent
         }
 
+
         const res = POST(url, {
             "eventId": eventId,
             "fee": fee,
@@ -236,36 +240,11 @@ export const actions = {
             "name": name,
             "isTeam": isTeam == "true",
             "markdown": markdown,
-            "organizers": organizers_buffer.keys().toArray(),
+            "organizers": organizers_buffer.entries().toArray(),
             // "password" : "Petrichor"
             "password": process.env.pass
         })
             .then(res => res.json())
-            .then(res => {
-                if (res.status == 200) {
-                    
-                    // fs.mkdirSync("./static/uploads", {
-                    //     recursive:true
-                    // })
-                    for (const buffer_entry of organizers_buffer.entries()){
-                        const [name, buffer_data] = buffer_entry
-                        const {buffer, old_name } = buffer_data
-                        if (old_name !== "") {
-                            if (name != old_name) {
-                                fs.renameSync(path.resolve(`./static/uploads/`, `${old_name.toLowerCase()}.png`),path.resolve(`./static/uploads/`, `${name.toLowerCase()}.png`))
-                                if (buffer != "") {
-                                    const savePath = path.resolve(`./static/uploads/`, `${name.toLowerCase()}.png`);
-                                    fs.writeFileSync(savePath, buffer);
-                                }
-                            }
-                        } else {
-                            const savePath = path.resolve(`./static/uploads/`, `${name.toLowerCase()}.png`);
-                            fs.writeFileSync(savePath, buffer);
-                        }
-                    }
-                }
-                return res
-            })
             .catch(err => {
                 console.log(err.toString())
                 return fail(500, { message: 'Failed to fetch response' })

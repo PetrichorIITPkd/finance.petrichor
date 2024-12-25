@@ -1,7 +1,7 @@
 import type { Data, Vtransaction } from "./types"
 
 // export const backend_url = "http://127.0.0.1:8000/"
-export const backend_url = 'https://petri-back.vercel.app/'
+export const backend_url = 'https://petri-back.vercel.app'
 // export const backend_url = 'https://petrichor-backend.vercel.app/'
 
 export let API = {
@@ -213,16 +213,43 @@ export const pre_components = [
     export let name = 'John Doe'
     export let phone = '123-456-7890'
     import { onMount } from "svelte";
+
+    let url = 'https://picsum.photos/200/300'
     let origin = "https://finance-petrichor.vercel.app"
-    onMount(() => {
-        if (window.top.location.origin){
+
+     onMount(() => {
+        if (window.top.location.origin)
             origin = window.top.location.origin
+    
+        // img_div = document.getElementById("back_bg") as HTMLDivElement;
+        if (phone != '123-456-7890') {
+            url = \`\${origin}/uploads/\${name.toLowerCase()}.png\`
+        }
+
+
+        if (origin ==  "https://finance-petrichor.vercel.app" || origin == "http://localhost:5173"){
+            fetch('https://petri-back.vercel.app/internal/image/', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                credentials: 'include',
+                mode: 'cors',
+                body: JSON.stringify({
+                    "name":name,
+                    "password": process.env.pass
+                })
+            }).then(res => res.json())
+            .then(res => {
+                const imageURL = \`data:image/png;base64,\${res.image}\`;
+                url = \`\${imageURL}\`;
+            })
         }
     })
 </script>
 
 <div class="main">
-    <div class="backpic" style="background-image: url('{phone == '123-456-7890' ? 'https://picsum.photos/200/300' : \`\${origin}/uploads/\${name.toLowerCase()}.png\`}');">
+    <div class="backpic" id="back_bg" style="background-image: url('{url}');">
     </div>
     <h2>{name}</h2>
     <p>{phone}</p>
