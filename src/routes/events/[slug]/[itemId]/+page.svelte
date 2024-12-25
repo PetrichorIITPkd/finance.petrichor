@@ -31,11 +31,11 @@
             .then((res) => {
                 const data = JSON.parse(JSON.parse(res.data)[0]);
                 if (data.isError) {
-                    console.log("here")
                     const contentWindow = iframe.contentWindow?.document.body.lastElementChild;
                     contentWindow.innerHTML = data.data;
                 } else {
                     transformed_code = data.data;
+                    update(transformed_code)
                 }
                 changed = false;
             })
@@ -145,6 +145,7 @@
     `;
     let height = 0;
     function update(code: string) {
+        console.log("Updating")
         iframe.contentWindow?.postMessage(code, "*");
         setTimeout(() => {
             height = iframe.contentWindow?.document.body.lastElementChild.scrollHeight + 40; // for padding
@@ -159,10 +160,8 @@
 
     function handleUpdate(onsubmit: { [x: string]: any; cancel: () => void }) {
         loading(true);
-        console.log(markdown)
         onsubmit.formData.set('markdown', markdown) 
         onsubmit.formData.set('eventId', event.eventId) 
-        console.log(onsubmit.formData.get('markdown'))
         return async ({ result }) => {
             loading(false);
             // console.log(result)
