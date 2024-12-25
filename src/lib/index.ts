@@ -167,6 +167,13 @@ export const pre_components = [
         padding: 10px;
         font-size: 22px;
     }
+    @media (max-width: 600px) {
+        div {
+        font-size: 17px;
+        padding: 0px;
+        margin: 0px;
+        }
+    }
 </style>`
     },
     {
@@ -205,12 +212,12 @@ export const pre_components = [
     export let personData = {
         name: 'John Doe',
         phone: '123-456-7890',
-        image: 'https://images.unsplash.com/photo-1622838320000-4b3b3b3b3b3b'
+        image: 'https://picsum.photos/200/300'
     }
 </script>
 
 <div class="main">
-    <div class="bg" style="background-image: url('{personData.image}');">
+    <div class="backpic" style="background-image: url('{personData.image}');">
     </div>
     <h2>{personData.name}</h2>
     <p>{personData.phone}</p>
@@ -228,12 +235,12 @@ export const pre_components = [
         overflow: hidden;
         width: 14em;
     }
-    div.bg{
+    .backpic{
         background-size: cover;
         background-position: center;
         position: relative;
         height: 12em;
-        aspect-ratio: 1;
+        width: 12em;
         border-radius: 0.4em;
         margin: 1rem;
         background-repeat: no-repeat;
@@ -253,14 +260,6 @@ export const pre_components = [
         width: fit-content;
         text-align: center;
         border-radius: 0 0 0.4em 0.4em;
-    }
-
-    @media screen and (max-width:600px){
-        div.main{
-            position: relative;
-            left: 20%;
-			transform: translate(-50%);
-        }
     }
 </style>`
     },
@@ -305,10 +304,21 @@ export const pre_components = [
         type: "svelte",
         source: `<script lang="ts">
     export let url = "#rules";
+	function handleClick() {
+		if (url.startsWith("#")) {
+			const rulesElement = document.getElementById(url.replace('#', ""));
+			if (rulesElement) {
+				rulesElement.scrollIntoView({ behavior: 'smooth' });
+				rulesElement.focus(); // Optionally focus the element
+			}
+		} else {
+			window.top.location.href = url;
+		}
+	}
 </script>
 
 <div class="buttons">
-    <a href={url} class="a-unset register"><slot></slot></a>
+    <button class="a-unset register" on:click={handleClick}><slot/></button>
 </div>
 
 <style>
@@ -316,9 +326,13 @@ export const pre_components = [
 		margin-top: 2rem;
 		margin-bottom: 2rem;
 	}
-	.buttons > a {
+	.buttons > button {
 		margin-left: 0.75em;
 		margin-right: 0.75em;
+	}
+	button {
+		border: none;
+		background-color: transparent;
 	}
     .a-unset {
         text-decoration: none;
@@ -338,6 +352,18 @@ export const pre_components = [
 		background-color: rgb(255, 255, 255);
 		color: black;
 	}
-</style>`
+        @media (max-width: 600px) {
+            .register {
+			display: block;
+			margin-bottom: 1em;
+			text-align: center;
+		}
+            .buttons {
+            margin-bottom: 0px;
+            }
+        }
+</style>
+
+`
     }
 ]

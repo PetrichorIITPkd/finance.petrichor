@@ -9,8 +9,17 @@
 
 <style>
     div {
-        width: 100%;
+    width: 90%;
+        border-radius: 10px;
+        margin: 10px;
         padding: 10px;
-        background-color: rgb(174, 166, 166);
+        font-size: 22px;
+    }
+    @media (max-width: 600px) {
+        div {
+        font-size: 17px;
+        padding: 0px;
+        margin: 0px;
+        }
     }
 </style>

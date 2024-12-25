@@ -330,7 +330,6 @@
         justify-content: center;
     }
     .outputArea {
-        overflow: hidden;
         width: 50%;
         border: 1px solid #4c66af;
         border-radius: 5px;

@@ -1,9 +1,20 @@
 <script lang="ts">
     export let url = "#rules";
+	function handleClick() {
+		if (url.startsWith("#")) {
+			const rulesElement = document.getElementById(url.replace('#', ""));
+			if (rulesElement) {
+				rulesElement.scrollIntoView({ behavior: 'smooth' });
+				rulesElement.focus(); // Optionally focus the element
+			}
+		} else {
+			window.top.location.href = url;
+		}
+	}
 </script>
 
 <div class="buttons">
-    <a href={url} class="a-unset register">slot</a>
+    <button class="a-unset register"><slot/></button>
 </div>
 
 <style>
@@ -14,6 +25,10 @@
 	.buttons > a {
 		margin-left: 0.75em;
 		margin-right: 0.75em;
+	}
+	button {
+		border: none;
+		background-color: transparent;
 	}
     .a-unset {
         text-decoration: none;
@@ -32,6 +47,14 @@
 	.register:hover {
 		background-color: rgb(255, 255, 255);
 		color: black;
+	}
+
+	@media {
+		.register {
+			display: block;
+			margin-bottom: 1em;
+			text-align: center;
+		}
 	}
 </style>
 

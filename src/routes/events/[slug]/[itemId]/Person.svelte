@@ -2,12 +2,12 @@
     export let personData = {
         name: 'John Doe',
         phone: '123-456-7890',
-        image: 'https://images.unsplash.com/photo-1622838320000-4b3b3b3b3b3b'
+        image: 'https://picsum.photos/200/300'
     }
 </script>
 
 <div class="main">
-    <div class="bg" style="background-image: url('{personData.image}');">
+    <div class="backpic" style="background-image: url('{personData.image}');">
     </div>
     <h2>{personData.name}</h2>
     <p>{personData.phone}</p>
@@ -25,12 +25,12 @@
         overflow: hidden;
         width: 14em;
     }
-    div.bg{
+    .backpic{
         background-size: cover;
         background-position: center;
         position: relative;
         height: 12em;
-        aspect-ratio: 1;
+        width: 12em;
         border-radius: 0.4em;
         margin: 1rem;
         background-repeat: no-repeat;
@@ -50,13 +50,5 @@
         width: fit-content;
         text-align: center;
         border-radius: 0 0 0.4em 0.4em;
-    }
-
-    @media screen and (max-width:600px){
-        div.main{
-            position: relative;
-            left: 20%;
-			transform: translate(-50%);
-        }
     }
 </style>
