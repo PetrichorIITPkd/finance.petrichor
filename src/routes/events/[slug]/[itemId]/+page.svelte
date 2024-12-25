@@ -14,8 +14,11 @@
 
     let markdown = "";
     let transformed_code: string;
-
+    let origin = "https://finance-petrichor.vercel.app"
     onMount(() => {
+        
+        if (window.location.origin)
+            origin = window.location.origin
         if (event) {
             markdown = event.markdown;
             convertToHtml()
@@ -117,7 +120,7 @@
 		width: 100vw;
                     filter: blur(5px) brightness(50%);
                     background-position: center;
-		background-size: cover;
+                    background-size: cover;
                     background-image: url("https://cdn.midjourney.com/cad16784-df60-49f4-952d-a46b0e5b311a/0_0.webp");
                 }
                 .content {
@@ -155,6 +158,8 @@
 
     $: iframe && transformed_code && update(transformed_code);
 
+    let organizers = event.organizers
+
     const displayPopUp: Function = getContext("displayPopUp");
     const loading: Function = getContext("loading");
 
@@ -162,6 +167,12 @@
         loading(true);
         onsubmit.formData.set('markdown', markdown) 
         onsubmit.formData.set('eventId', event.eventId) 
+        const prev_organizer_map = {}
+        event.organizers.forEach((organizer, index) => {
+            prev_organizer_map[`organizers${index}`] = organizer
+        })
+        onsubmit.formData.set('previous_organizers', JSON.stringify(prev_organizer_map)) 
+
         return async ({ result }) => {
             loading(false);
             // console.log(result)
@@ -191,9 +202,7 @@
                 setTimeout(() => {
                     displayPopUp(
                         "Alert",
-                        result.data.err
-                            ? result.data.err
-                            : "Unknown Error. Please contact the administration",
+                        result.data.message ?? "Some Error encountered",
                         2000,
                         () => {},
                     );
@@ -209,7 +218,7 @@
     </h1>
     <div class="update_Area">
         <!-- Geeteshwar's progress here -->
-        <form method="post" action="?/update" use:enhance={handleUpdate}>
+        <form method="post" action="?/update" enctype="multipart/form-data" use:enhance={handleUpdate}>
             <span>
                 <p>EventId</p>
                 <input name="eventId" type="text" value={event.eventId} disabled/>
@@ -254,6 +263,39 @@
                     </label>
                 </div>
             </span>
+            <span>
+                <button type="button" on:click={() => {organizers.push(0); organizers = organizers}}>Add Organizer</button>
+            </span>
+            {#each organizers as organizer, index}
+            <span style="margin: 30px 0;display:flex; flex-wrap:wrap">
+                <span>
+                    <label for={`organizers${index}${(organizer == 0) ? "new" : ""}`} >Organizer {index}: </label>
+                    <input name={`organizers${index}${(organizer == 0) ? "new" : ""}` } type="file" accept=".png" placeholder="Organizer" />
+                </span>
+                <span>
+
+                    <label for={`name_organizers${index}${(organizer == 0) ? "new" : ""}`} >Name</label>
+                    <input name={`name_organizers${index}${(organizer == 0) ? "new" : ""}`} type="text" value={(organizer == 0) ? "" : organizer} />
+                </span>
+                <span>
+
+                    <label for={`overwrite_organizers${index}${(organizer == 0) ? "new" : ""}`}>Overwrite if name exists:</label>
+                    {#if organizer == 0}
+                    <input 
+                    name={`overwrite_organizers${index}${(organizer == 0) ? "new" : ""}`} 
+                    type="checkbox" 
+                    />
+                    {:else}
+                    <input 
+                    name={`overwrite_organizers${index}${(organizer == 0) ? "new" : ""}`} 
+                    type="checkbox" 
+                    checked
+                    />
+                    {/if}
+                </span>
+            </span>
+
+            {/each}
             <span>
                 <button type="submit">{(data.type == "new") ? "Create": "Update"}</button>
                 <button type="button" on:click={convertToHtml}>Convert</button>

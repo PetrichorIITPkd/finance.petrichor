@@ -1,16 +1,19 @@
 <script lang="ts">
-    export let personData = {
-        name: 'John Doe',
-        phone: '123-456-7890',
-        image: 'https://picsum.photos/200/300'
-    }
+    export let name = 'John Doe'
+    export let phone = '123-456-7890'
+    import { onMount } from "svelte";
+    let origin = "https://finance-petrichor.vercel.app"
+    onMount(() => {
+        if (window.top.location.origin)
+            origin = window.top.location.origin
+    })
 </script>
 
 <div class="main">
-    <div class="backpic" style="background-image: url('{personData.image}');">
+    <div class="backpic" style="background-image: url('{phone == '123-456-7890' ? 'https://picsum.photos/200/300' : `${origin}/uploads/${name.toLowerCase()}.png`}');">
     </div>
-    <h2>{personData.name}</h2>
-    <p>{personData.phone}</p>
+    <h2>{name}</h2>
+    <p>{phone}</p>
 </div>
 
 

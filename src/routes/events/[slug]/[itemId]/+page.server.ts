@@ -6,8 +6,10 @@ import { API, default_event, events, POST, pre_components } from '$lib';
 import { compile } from "svelte/compiler";
 import { compile as mdcompile } from "mdsvex"
 import { build } from 'esbuild';
+import fs from "fs";
 import type { PageServerLoad } from './$types';
 import { fail, error } from '@sveltejs/kit';
+import path from 'path';
 
 export const load: PageServerLoad = async ({ params, url }) => {
     if (params.slug != process.env.pass) {
@@ -86,9 +88,9 @@ export const actions = {
                 name: 'esbuild-plugin',
                 setup(build) {
                     build.onResolve({ filter: /.*/ }, (args) => {
-                        // console.log("J", args)
                         if (args.path === 'svelte') {
-                            return { path: `${CDN_URL}/svelte/index.mjs`, namespace: 'cdn' };
+                            // console.log("J", args)
+                            return { path: `${CDN_URL}/svelte/internal/index.mjs`, namespace: 'cdn' };
                         }
                         if (args.path.startsWith('svelte/')) {
                             return { path: `${CDN_URL}/svelte/${args.path.slice(7)}/index.mjs`, namespace: 'cdn' };
@@ -157,6 +159,7 @@ export const actions = {
         const minMember = formData.get('minMember');
         const isTeam = formData.get('isTeam');
         const markdown = formData.get('markdown');
+        const previous_organizers = JSON.parse(formData.get('previous_organizers'));
 
         // Validation
         if (!eventId || !name || !fee || !maxMember || !minMember || !isTeam) {
@@ -175,6 +178,51 @@ export const actions = {
             return fail(400, { message: 'isTeam must be "true" or "false".' });
         }
 
+        const organizers = formData.entries()
+        const organizers_buffer = new Map()
+
+        for (const organizer of organizers) {
+            const [key, file] = organizer
+            if (key.startsWith('organizers')) {
+                if (file.name === "" && key.endsWith("new")) {
+                    return fail(404, { message: 'Please provide an image for ' + key.substring(0,key.length - 3) });
+                }
+                const name = formData.get(`name_${key}`)?.toString()
+                const to_overwrite = formData.get(`overwrite_${key}`) == "on"
+
+                if (!name || name == "") {
+                    return fail(404, { message: 'Please provide name for ' + key });
+                }
+                if ((Array.from(organizers_buffer.keys()).some(existingName => existingName.toLowerCase() === name.toLowerCase()))) {
+                    return fail(404, { message: 'Duplicate Organizer name'});
+                }
+
+                if (!key.endsWith("new") && file.name == "" ) {
+                    const old_name = previous_organizers[key]
+                    organizers_buffer.set(name, {
+                        "buffer": "",
+                        "old_name": old_name
+                    })
+                    if (!( fs.existsSync(path.resolve(`./static/uploads/`, `${old_name.toLowerCase()}.png`))) ) {
+                        return fail(404, { message: `${old_name}'s image does not exists with us. Please reupload.`});
+                    }
+                }
+                else if (( fs.existsSync(path.resolve(`./static/uploads/`, `${name.toLowerCase()}.png`))) && !to_overwrite ) {
+                    organizers_buffer.set(name, {
+                        "buffer": "",
+                        "old_name": name
+                    })
+                } else {
+                    // Convert the file to a buffer and save it
+                    const buffer = Buffer.from(await file.arrayBuffer());
+                    organizers_buffer.set(name,{
+                        "buffer": buffer,
+                        "old_name": ""
+                    })
+                }
+            }
+        }
+
         let url = API.updateEvent
         if (formData.get('type') == "new") {
             url = API.addEvent
@@ -188,11 +236,34 @@ export const actions = {
             "name": name,
             "isTeam": isTeam == "true",
             "markdown": markdown,
+            "organizers": organizers_buffer.keys().toArray(),
             // "password" : "Petrichor"
             "password": process.env.pass
         })
             .then(res => res.json())
+            .then(res => {
+                if (res.status == 200) {
+                    for (const buffer_entry of organizers_buffer.entries()){
+                        const [name, buffer_data] = buffer_entry
+                        const {buffer, old_name } = buffer_data
+                        if (old_name !== "") {
+                            if (name != old_name) {
+                                fs.renameSync(path.resolve(`./static/uploads/`, `${old_name.toLowerCase()}.png`),path.resolve(`./static/uploads/`, `${name.toLowerCase()}.png`))
+                                if (buffer != "") {
+                                    const savePath = path.resolve(`./static/uploads/`, `${name.toLowerCase()}.png`);
+                                    fs.writeFileSync(savePath, buffer);
+                                }
+                            }
+                        } else {
+                            const savePath = path.resolve(`./static/uploads/`, `${name.toLowerCase()}.png`);
+                            fs.writeFileSync(savePath, buffer);
+                        }
+                    }
+                }
+                return res
+            })
             .catch(err => {
+                console.log(err.toString())
                 return fail(500, { message: 'Failed to fetch response' })
             })
 
