@@ -1,11 +1,12 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
+    import { onMount } from "svelte";
 
     export let events: Event[]  = [];
     export let pass:string = "";
-
+    let selectedOption = "Technical";
     function addEvent() {
-        goto(`/events/${pass}/new`)
+        goto(`/events/${pass}/new?type=${selectedOption}`)
     }
 </script>
 
@@ -20,6 +21,18 @@
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
+    div {
+    margin: 20px;
+  }
+  label {
+    font-size: 16px;
+    margin-right: 10px;
+  }
+  select {
+    font-size: 16px;
+    padding: 5px;
+  }
 
     .header {
         display: flex;
@@ -78,6 +91,19 @@
 
 <div class="container">
     <div class="header">
+        
+    <div>
+        <label for="event-type">Choose an event type:</label>
+        <select id="event-type" bind:value={selectedOption}>
+        <option value="Workshop">Workshop</option>
+        <option value="Technical">Technical</option>
+        <option value="Cultural">Cultural</option>
+        <option value="Informal">Informal</option>
+        </select>
+        {#if selectedOption}
+        <p>You selected: {selectedOption}</p>
+        {/if}
+    </div>
         <button class="add-event-btn" on:click={addEvent}>Add Event</button>
     </div>
 

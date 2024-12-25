@@ -1,5 +1,8 @@
+<script lang="ts">
+    export let name;
 
-<div>
+</script>
+<div id={name}>
 
     <slot/>
 </div>
@@ -7,7 +10,6 @@
 <style>
     div {
         width: 100%;
-        box-shadow: 0 0 10px gray;
         padding: 10px;
         background-color: rgb(174, 166, 166);
     }

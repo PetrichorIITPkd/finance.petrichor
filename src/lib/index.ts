@@ -1,13 +1,14 @@
 import type { Data, Vtransaction } from "./types"
 
-// export const backend_url = "http://127.0.0.1:8000/"
-export const backend_url = 'https://petri-back.vercel.app/'
+export const backend_url = "http://127.0.0.1:8000/"
+// export const backend_url = 'https://petri-back.vercel.app/'
 // export const backend_url = 'https://petrichor-backend.vercel.app/'
 
 export let API = {
     addEvent: `${backend_url}/internal/events/add/`,
     updateEvent: `${backend_url}/internal/events/update/`,
     allEvents: `${backend_url}/internal/events/all/`,
+    nextEventid: `${backend_url}/internal/event/getNextId/`,
     getEvent: `${backend_url}/internal/event/`,
 }
 
@@ -18,7 +19,95 @@ export const default_event = {
     maxMember: 1,
     isTeam: false,
     fee: 0,
-    markdown: ""
+    markdown: `
+<script>
+  import Box from "./Box.svelte";
+  import Person from "./Person.svelte"
+  import FlexSection from "./FlexSection.svelte"
+  import CenterSection from "./CenterSection.svelte"
+  import Section from "./Section.svelte";
+  import Button from "./Button.svelte";
+</script>
+
+<Box>
+
+# Voicestra
+
+27-09-2025
+
+Join our solo singing competition, welcoming voices from East and West,
+spanning every genre! Elevate your voice, captivate the audience, and
+let the world be spellbound by your talent. It's your moment to enchant
+and leave everyone breathless, no matter the genre or cultural influence
+every style is welcome.
+
+<FlexSection>
+
+<Button url="#rules">Learn More</Button>
+<Button url="#register">Register</Button>
+  
+</FlexSection>
+
+</Box>
+
+<Section name="rules">
+
+### Rules
+
+<ul>
+<li>Participants must finish the painting within 60 minutes.</li>
+<li>The theme will be announced before the event.</li> 
+<li>Participants are supposed to bring the necessary brushes, sponges and mixing trays.</li>
+<li>Paints will be provided.</li>
+<li>No part of the design may be applied to the models face before the start of the event.</li>
+<li>Painting must not extend down the neck or onto the models chest, shoulders or back areas.</li>
+<li>Hair may be clipped or pinned back to fully expose the design area.</li>
+<li>Participants should respect the time limit and not disrupt other contestants.</li>
+<li>Any inappropriate or offensive designs will result in disqualification.</li>
+<li>Decision made by the judges are final. Requests to reconsider the final decision would not be entertained.</li>
+</ul>
+
+</Section>
+
+<Section name="structure">
+
+### Structure
+
+<ul>
+<li>Participants must finish the painting within 60 minutes.</li>
+<li>The theme will be announced before the event.</li> 
+<li>Participants are supposed to bring the necessary brushes, sponges and mixing trays.</li>
+<li>Paints will be provided.</li>
+<li>No part of the design may be applied to the models face before the start of the event.</li>
+<li>Painting must not extend down the neck or onto the models chest, shoulders or back areas.</li>
+<li>Hair may be clipped or pinned back to fully expose the design area.</li>
+<li>Participants should respect the time limit and not disrupt other contestants.</li>
+<li>Any inappropriate or offensive designs will result in disqualification.</li>
+<li>Decision made by the judges are final. Requests to reconsider the final decision would not be entertained.</li>
+</ul>
+
+</Section>
+
+<CenterSection>
+
+# Organizer
+
+<FlexSection>
+
+<Person />
+<Person />
+
+</FlexSection>
+
+</CenterSection>
+`
+}
+
+export const events = {
+    "Workshop" : "W",
+    "Technical" : "T",
+    "Cultural" : "C",
+    "Informal" : "I"
 }
 
 export async function POST(url: string, body: any) {
@@ -59,69 +148,24 @@ export async function reloadData(){
 export const pre_components = [
     {
         id: 1,
-        name : 'Count',
-        type: "svelte",
-        source: `
-<script>
-	export let count = 0;
-</script>
-
-<span class="outer">
-	<button on:click="{() => count = count - 1}">-</button>
-	<span class="inner">{count}</span>
-	<button on:click="{() => count = count + 1}">+</button>
-</span>
-
-<style>
-	.outer {
-		background: darkorange;
-		height: 20px;
-		font-size: 12px;
-		display: inline-flex;
-		justify-content: space-between;
-		align-items: center;
-		transform: translateY(-1px);
-		margin: 0 5px;
-		border-radius: 3px;
-		width: 65px;
-		box-shadow: 0 3px 15px 1px rgba(0,0,0,0.3)
-  }
-
-	.inner {
-		margin: 0 0px;
-  }
-
-	button {
-		height: 20px;
-		padding: 0px 7px 1px 7px;
-		margin: 0;
-		border: none;
-		background: none;
-		color: #eee;
-		font-weight: bold;
-		cursor: pointer;
-	}
-</style>
-`
-    },
-    {
-        id: 1,
         name : 'Section',
         type: "svelte",
-        source: `
-<div>
+        source: `<script lang="ts">
+    export let name;
+
+</script>
+<div id={name}>
 
     <slot/>
 </div>
 
 <style>
     div {
-        width: 90%;
+    width: 90%;
         border-radius: 10px;
         margin: 10px;
-        box-shadow: 0 0 10px gray;
         padding: 10px;
-        background-color: rgb(174, 166, 166);
+        font-size: 22px;
     }
 </style>`
     },
@@ -133,11 +177,24 @@ export const pre_components = [
 
 <style>
 	div {
-		background-color: rgb(174, 166, 166);
-		padding: 2rem 2rem;
-		text-align: center;
-        width: 100%;
-  }
+		display: flex;
+		flex-direction: column;
+		width: 85%;
+		place-items: center;
+		background-color: rgba(0, 0, 0, 0.146);
+		/*
+		* Created with https://www.css-gradient.com
+		* Gradient link: https://www.css-gradient.com/?c1=ab84d1&c2=1422c1&gt=l&gd=dtl
+		*/
+		/* background: #ab84d14b; */
+		/* background: linear-gradient(135deg, #ab84d134, #1422c139); */
+		backdrop-filter: blur(100px);
+		background-size: 150% 150%;
+		padding: 1rem;
+		border-radius: 12px;
+		margin-top: 1em;
+		/* animation: banneranim 5s linear infinite; */
+	}
 </style>`
     },
     {
@@ -209,7 +266,7 @@ export const pre_components = [
     },
     {
         id: 1,
-        name : 'Organisers',
+        name : 'FlexSection',
         type: "svelte",
         source: `<div><slot /></div>
 
@@ -217,6 +274,7 @@ export const pre_components = [
     div{
         display: flex;
         justify-content: center;
+        flex-wrap: wrap;
     }
     div h1{
         diplay: inline;
@@ -227,7 +285,11 @@ export const pre_components = [
         id: 1,
         name : 'CenterSection',
         type: "svelte",
-        source: `<div><slot/></div>
+        source: `<script lang="ts">
+    export let name;
+</script>
+
+<div id="{name}"><slot/></div>
 
 <style>
     div {
@@ -235,6 +297,47 @@ export const pre_components = [
         flex-direction: column;
         align-items: center;
     }
+</style>`
+    }
+    ,{
+        id: 1,
+        name : 'Button',
+        type: "svelte",
+        source: `<script lang="ts">
+    export let url = "#rules";
+</script>
+
+<div class="buttons">
+    <a href={url} class="a-unset register"><slot></slot></a>
+</div>
+
+<style>
+    .buttons {
+		margin-top: 2rem;
+		margin-bottom: 2rem;
+	}
+	.buttons > a {
+		margin-left: 0.75em;
+		margin-right: 0.75em;
+	}
+    .a-unset {
+        text-decoration: none;
+        color: white;
+    }
+    .register {
+		padding: 0.8em;
+		padding-inline: 1em;
+		background-color: rgba(237, 237, 237, 0.137);
+		border-radius: 0.4em;
+		border: unset;
+		color: white;
+		font-size: 20px;
+		transition: 200ms ease-in-out;
+	}
+	.register:hover {
+		background-color: rgb(255, 255, 255);
+		color: black;
+	}
 </style>`
     }
 ]
