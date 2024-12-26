@@ -19,6 +19,7 @@ export const default_event = {
     maxMember: 1,
     isTeam: false,
     fee: 0,
+    image_url: "https://picsum.photos/1000/1000",
     organizers:[],
     markdown: `
 <script>

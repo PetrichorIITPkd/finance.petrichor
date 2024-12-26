@@ -157,11 +157,16 @@ export const actions = {
         const minMember = formData.get('minMember');
         const isTeam = formData.get('isTeam');
         const markdown = formData.get('markdown');
+        const image_url = formData.get('image_url');
         const previous_organizers = JSON.parse(formData.get('previous_organizers'));
 
         // Validation
         if (!eventId || !name || !fee || !maxMember || !minMember || !isTeam) {
             return fail(400, { message: 'All fields are required.' });
+        }
+        
+        if (!image_url || image_url == "") {
+            return fail(400, { message: 'Image url not provided' });
         }
 
         if (isNaN(Number(fee))) {
@@ -240,6 +245,7 @@ export const actions = {
             "name": name,
             "isTeam": isTeam == "true",
             "markdown": markdown,
+            "image_url": image_url,
             "organizers": organizers_buffer.entries().toArray(),
             // "password" : "Petrichor"
             "password": process.env.pass

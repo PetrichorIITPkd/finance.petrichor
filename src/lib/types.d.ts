@@ -24,7 +24,8 @@ export type Event = {
     minMember:number,
     maxMember:number,
     isTeam:boolean,
-    markdown:string
+    markdown:string,
+    image_url: string
 }
 
 export type member = {

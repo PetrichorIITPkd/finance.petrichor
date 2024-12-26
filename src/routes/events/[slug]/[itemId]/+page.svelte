@@ -239,6 +239,10 @@
                 <p>minMember</p>
                 <input name="minMember" type="number" value={event.minMember} />
             </span>
+            <span>
+                <p>Background Image</p>
+                <input name="image_url" type="text" value={event.image_url} />
+            </span>
             <input hidden name="type" value={data.type} />
             <span>
                 <p>isTeam</p>
