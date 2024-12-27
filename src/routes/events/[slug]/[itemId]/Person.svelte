@@ -13,26 +13,26 @@
         // img_div = document.getElementById("back_bg") as HTMLDivElement;
         if (phone != '123-456-7890') {
             url = `${origin}/uploads/${name.toLowerCase()}.png`
-        }
+        
 
-
-        if (origin ==  "https://finance-petrichor.vercel.app" || origin == "http://localhost:5173"){
+            if (origin ==  "https://finance-petrichor.vercel.app" || origin == "http://localhost:5173"){
             fetch('https://petri-back.vercel.app/internal/image/', {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json',
-                },
-                credentials: 'include',
-                mode: 'cors',
-                body: JSON.stringify({
-                    "name":name,
-                    "password": process.env.pass
+                    method: 'POST',
+                    headers: {
+                        'Content-type': 'application/json',
+                    },
+                    credentials: 'include',
+                    mode: 'cors',
+                    body: JSON.stringify({
+                        "name":name,
+                        "password": process.env.pass
+                    })
+                }).then(res => res.json())
+                .then(res => {
+                    const imageURL = `data:image/png;base64,${res.image}`;
+                    url = `${imageURL}`;
                 })
-            }).then(res => res.json())
-            .then(res => {
-                const imageURL = `data:image/png;base64,${res.image}`;
-                url = `${imageURL}`;
-            })
+            }
         }
     })
 </script>

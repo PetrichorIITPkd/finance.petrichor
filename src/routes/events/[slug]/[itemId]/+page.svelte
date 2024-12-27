@@ -4,10 +4,11 @@
     import { enhance } from "$app/forms";
     import { getContext, onMount } from "svelte";
     import { goto } from "$app/navigation";
+    import type { Event } from "$lib/types";
 
     export let data: any;
 
-    let event = data.event;
+    let event: Event = data.event;
     let changed = false;
 
     let iframe: HTMLIFrameElement;
@@ -64,15 +65,16 @@
                 let c;
 
                 function update(source) {
-                    
+				
                     const blob = new Blob([source],{ type: 'text/javascript' });
                     const url = URL.createObjectURL(blob);
-                    
+					const content_holder = document.getElementById('content_holder')
+					// console.log(source)
                     import(url).then(( { default : App }) => {
                         if (c) c.$destroy();
 
-                        document.body.lastElementChild.innerHTML = '';
-                        c = new App({ target: document.body.lastElementChild })
+                        content_holder.innerHTML = '';
+                        c = new App({ target: content_holder })
                     
                     })
 
@@ -108,9 +110,6 @@
     --ofont: 'Arial', sans-serif;
     --sfont: 'Fredericka the Great', sans-serif;
   }
-            html,body {
-                overflow:hidden;
-            }
                 .bg {
                     
 		position: fixed;
@@ -120,8 +119,8 @@
 		width: 100vw;
                     filter: blur(5px) brightness(50%);
                     background-position: center;
-                    background-size: cover;
-                    background-image: url("https://cdn.midjourney.com/cad16784-df60-49f4-952d-a46b0e5b311a/0_0.webp");
+		background-size: cover;
+                    background-image: url(${event.image_url});
                 }
                 .content {
                     z-index: 1;
@@ -137,21 +136,47 @@
                 }
                 body {
                     margin: 0;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					flex-direction: column;
                 }
+					#register {
+		border: none;
+		background-color: rgba(164, 164, 164, 0.545);
+		padding: 10px;
+		border-radius: 5px;
+		margin: 10px 20px;
+		font-size: 20px;
+		color: white;
+		position: relative;
+		text-decoration: none;
+		z-index: 10;
+	}
+				@media (max-width:600px) {
+					.content {
+					z-index: 1;
+					padding-top: 2em;
+					margin: 0;
+					padding-left: 0;
+				}
+				}
         </style>
         </head>
         <body>
             <div class="bg"> </div>
-            <div class="content"></div>
+            <div class="content" id="content_holder"></div>
+			<a id="register" href="https://petrichor.events/payment/register?id=${event.eventId}" target="_top">Register</a>
         </body>  
     </html>
     `;
+
     let height = 0;
     function update(code: string) {
         console.log("Updating")
         iframe.contentWindow?.postMessage(code, "*");
         setTimeout(() => {
-            height = iframe.contentWindow?.document.body.lastElementChild.scrollHeight + 40; // for padding
+            height = iframe.contentWindow?.document.getElementById('content_holder').scrollHeight + 40; // for padding
             // console.log(height)
         }, 100);
     }

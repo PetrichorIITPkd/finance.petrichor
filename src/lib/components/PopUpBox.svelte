@@ -40,6 +40,38 @@
 
 </script>
 
+{#if PopUpObj.members}
+
+<dialog bind:this={popUpDialog}>
+    <div class="popUp Box">
+        <div class="restBox">
+            <p>Members</p>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                </tr>
+                {#each PopUpObj.members as member,ind}
+                    <tr>
+                        <td>{ind == 0? "Registered By:" :""}{member.name}</td>
+                        <td>{member.email}</td>
+                        <td>{member.phone}</td>
+                    </tr>
+                {/each}
+            </table>
+            <div class="buttonDiv">
+                <button
+                    on:click={() => {
+                        popUpDialog.close();
+                    }}>Dismiss</button
+                >
+            </div>
+        </div>
+    </div>
+</dialog>
+
+{:else}
 <dialog bind:this={popUpDialog}>
     <div class="popUp Box" >
         <div class="popUpTitleBox">
@@ -60,8 +92,19 @@
         </div>
     </div>
 </dialog>
+{/if}
 
 <style>
+    table{
+        padding: 20px;
+    }
+    td, th{
+        text-align: center;
+        color: #0fd8d5a0;
+    }
+    th{
+        color: rgb(204, 0, 255);
+    }
     button{
         color: white;
         background-color: #7171714a;

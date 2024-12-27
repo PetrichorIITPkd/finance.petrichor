@@ -201,7 +201,7 @@
                             >
                         {/if}
                         <td
-                            ><button on:click={() => displayPopUp(d.members)}
+                            ><button on:click={() => displayPopUp(d["members"])}
                                 >View</button
                             ></td
                         >

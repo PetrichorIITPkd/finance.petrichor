@@ -33,7 +33,7 @@ export const default_event = {
 
 <Box>
 
-# Voicestra
+# Event 1
 
 27-09-2025
 
@@ -338,6 +338,12 @@ export const pre_components = [
         type: "svelte",
         source: `<script lang="ts">
     export let url = "#rules";
+    import { onMount } from "svelte";
+    let origin = ""
+    onMount(() => {
+        origin = window.top?.location.url    
+    })
+
 	function handleClick() {
 		if (url.startsWith("#")) {
 			const rulesElement = document.getElementById(url.replace('#', ""));
@@ -345,7 +351,9 @@ export const pre_components = [
 				rulesElement.scrollIntoView({ behavior: 'smooth' });
 				rulesElement.focus(); // Optionally focus the element
 			}
-		} else {
+		} else if (url == "register") {
+            window.top.location.href = \`\${origin}/#register\`
+        }else {
 			window.top.location.href = url;
 		}
 	}
@@ -360,7 +368,7 @@ export const pre_components = [
 		margin-top: 2rem;
 		margin-bottom: 2rem;
 	}
-	.buttons > button {
+	.buttons > a {
 		margin-left: 0.75em;
 		margin-right: 0.75em;
 	}
@@ -377,6 +385,7 @@ export const pre_components = [
 		padding-inline: 1em;
 		background-color: rgba(237, 237, 237, 0.137);
 		border-radius: 0.4em;
+        margin: 0 10px;
 		border: unset;
 		color: white;
 		font-size: 20px;
@@ -386,16 +395,14 @@ export const pre_components = [
 		background-color: rgb(255, 255, 255);
 		color: black;
 	}
-        @media (max-width: 600px) {
-            .register {
+
+	@media (max-width: 600px){
+		.register {
 			display: block;
 			margin-bottom: 1em;
 			text-align: center;
 		}
-            .buttons {
-            margin-bottom: 0px;
-            }
-        }
+	}
 </style>
 
 `
