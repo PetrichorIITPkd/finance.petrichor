@@ -225,27 +225,30 @@ export const pre_components = [
         // img_div = document.getElementById("back_bg") as HTMLDivElement;
         if (phone != '123-456-7890') {
             url = \`\${origin}/uploads/\${name.toLowerCase()}.png\`
-        }
-        console.log(origin)
+            console.log("Origin:", origin)
 
-        if (origin ==  "https://finance-petrichor.vercel.app" || origin == "http://localhost:5173"){
-            console.log(origin)
+            if (origin ==  "https://finance-petrichor.vercel.app" || origin == "http://localhost:5173"){
+            console.log("Fetching image")
             fetch('https://petri-back.vercel.app/internal/image/', {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json',
-                },
-                credentials: 'include',
-                mode: 'cors',
-                body: JSON.stringify({
-                    "name":name,
+                    method: 'POST',
+                    headers: {
+                        'Content-type': 'application/json',
+                    },
+                    credentials: 'include',
+                    mode: 'cors',
+                    body: JSON.stringify({
+                        "name":name,
                     "password": process.env.pass
+                    })
+                }).then(res => res.json())
+                .then(res => {
+                console.log("Got Image")
+                    const imageURL = \`data:image/png;base64,\${res.image}\`;
+                    url = \`\${imageURL}\`;
+                }).catch(err => {
+                    console.log("image fetch error: ",err.toString())
                 })
-            }).then(res => res.json())
-            .then(res => {
-                const imageURL = \`data:image/png;base64,\${res.image}\`;
-                url = \`\${imageURL}\`;
-            })
+            }
         }
     })
 </script>

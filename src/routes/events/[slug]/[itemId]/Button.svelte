@@ -64,6 +64,9 @@
 			margin-bottom: 1em;
 			text-align: center;
 		}
+		.buttons {
+            margin: 0px;
+        }
 	}
 </style>
 
