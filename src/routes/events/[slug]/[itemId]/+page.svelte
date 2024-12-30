@@ -278,8 +278,8 @@
             </span>
             <input hidden name="type" value={data.type} />
             <span class="isTeam">
-                <p>isTeam: <br/>if set to <strong>false</strong> then above fee is taken as <strong>per participants fee</strong> i.e. amount taken by user = event.fee * no_of_participants. 
-                    <br/> if set to <strong>true</strong> then above fee is taken as <strong>'per team fee'</strong> i.e. amount taken by user = event.fee(the number of participants is not taken into account)</p>
+                <p>isTeam: <br/><li>if set to <strong>false</strong> then above fee is taken as <strong>per participants fee</strong> i.e. amount taken by user = event.fee * no_of_participants. </li>
+                    <br/> <li>if set to <strong>true</strong> then above fee is taken as <strong>'per team fee'</strong> i.e. amount taken by user = event.fee(the number of participants is not taken into fee calculations) </li></p>
                 <div style="display: flex;flex-direction:column">
                     <label>
                         <input
@@ -411,6 +411,10 @@
         padding: 10px 10px;
         justify-content: center;
     }
+    .isTeam {
+        display: flex;
+        flex-direction: column;
+    }
     .outputArea {
         width: 50%;
         border: 1px solid #4c66af;
@@ -427,10 +431,6 @@
         }
         .textareaElement {
             width: 100%;
-        }
-        .isTeam {
-            display: flex;
-            flex-direction: column;
         }
         .isTeam div {
             display: flex;
