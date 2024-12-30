@@ -278,7 +278,8 @@
             </span>
             <input hidden name="type" value={data.type} />
             <span>
-                <p>isTeam</p>
+                <p>isTeam: <br/>if set to <strong>false</strong> then above fee is taken as <strong>per participants fee</strong> i.e. amount taken by user = event.fee * no_of_participants. 
+                    <br/> if se to <strong>true</strong> tehn above fee is taken as <strong>'per team fee'</strong> i.e. amount taken by user = event.fee(the number of participants is not taken into account)</p>
                 <div>
                     <label>
                         <input
