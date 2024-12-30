@@ -277,10 +277,10 @@
                 <input name="image_url" type="text" value={event.image_url} />
             </span>
             <input hidden name="type" value={data.type} />
-            <span>
+            <span class="isTeam">
                 <p>isTeam: <br/>if set to <strong>false</strong> then above fee is taken as <strong>per participants fee</strong> i.e. amount taken by user = event.fee * no_of_participants. 
-                    <br/> if se to <strong>true</strong> tehn above fee is taken as <strong>'per team fee'</strong> i.e. amount taken by user = event.fee(the number of participants is not taken into account)</p>
-                <div>
+                    <br/> if set to <strong>true</strong> then above fee is taken as <strong>'per team fee'</strong> i.e. amount taken by user = event.fee(the number of participants is not taken into account)</p>
+                <div style="display: flex;flex-direction:column">
                     <label>
                         <input
                             name="isTeam"
@@ -301,6 +301,7 @@
                     </label>
                 </div>
             </span>
+            <hr/>
             <span>
                 <button type="button" on:click={() => {organizers.push(0); organizers = organizers}}>Add Organizer</button>
             </span>
@@ -334,6 +335,7 @@
             </span>
 
             {/each}
+            <hr/>
             <span>
                 <button type="submit">{(data.type == "new") ? "Create": "Update"}</button>
                 <button type="button" on:click={convertToHtml}>Convert</button>
@@ -425,6 +427,13 @@
         }
         .textareaElement {
             width: 100%;
+        }
+        .isTeam {
+            display: flex;
+            flex-direction: column;
+        }
+        .isTeam div {
+            display: flex;
         }
     }
 </style>
