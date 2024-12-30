@@ -133,7 +133,7 @@
 				filter: blur(5px) brightness(50%);
 				background-position: center;
 				background-size: cover;
-				background-image: url(${currentEvent.image});
+				background-image: url(${event.image_url});
 			}
 			.content {
 				z-index: 1;
