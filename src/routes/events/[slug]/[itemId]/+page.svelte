@@ -173,6 +173,7 @@
         </style>
         </head>
         <body>
+            <div class="bg"> </div>
             <div class="content" id="content_holder"></div>
 			<span id="register"></span>
         </body>  
