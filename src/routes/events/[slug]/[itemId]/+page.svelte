@@ -112,6 +112,7 @@
                     1px 3px 1px #a5a5a5
                     ;
 				font-size: 40px;
+                text-align: center;
             }
             ::-webkit-scrollbar {
 				width: 1px;
