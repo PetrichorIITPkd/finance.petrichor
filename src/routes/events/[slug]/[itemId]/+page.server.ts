@@ -158,6 +158,8 @@ export const actions = {
         const isTeam = formData.get('isTeam');
         const markdown = formData.get('markdown');
         const image_url = formData.get('image_url');
+        const tags = JSON.parse(formData.get('tags'));
+        const online = formData.get('online');
         const previous_organizers = JSON.parse(formData.get('previous_organizers'));
 
         // Validation
@@ -235,7 +237,13 @@ export const actions = {
         if (formData.get('type') == "new") {
             url = API.addEvent
         }
-
+        
+        if (online == "true")  {
+            tags[0] = "online"
+        } else {
+            tags[0] = "offline"
+        }
+        // console.log(tags)
 
         const res = POST(url, {
             "eventId": eventId,
@@ -247,6 +255,7 @@ export const actions = {
             "markdown": markdown,
             "image_url": image_url,
             "organizers": organizers_buffer.entries().toArray(),
+            "tags": tags,
             // "password" : "Petrichor"
             "password": process.env.backend_pass
         })

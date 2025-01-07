@@ -25,6 +25,7 @@ export type Event = {
     maxMember:number,
     isTeam:boolean,
     markdown:string,
+    tags: string[],
     image_url: string
 }
 

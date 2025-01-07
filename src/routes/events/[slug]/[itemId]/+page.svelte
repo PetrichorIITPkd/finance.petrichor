@@ -206,7 +206,21 @@
     $: iframe && transformed_code && update(transformed_code);
 
     let organizers = event.organizers
-
+    let online : boolean;
+    let tag : string;
+    if (event.tags == undefined) {
+        online = false
+        tag = ""
+    } else {
+        online = event.tags[0] == "online"
+        tag = event.tags[1] 
+    }
+    if (online == undefined) {
+        online = false
+    }
+    if (tag == undefined) {
+        tag = ""
+    }
     const displayPopUp: Function = getContext("displayPopUp");
     const loading: Function = getContext("loading");
 
@@ -219,6 +233,7 @@
             prev_organizer_map[`organizers${index}`] = organizer
         })
         onsubmit.formData.set('previous_organizers', JSON.stringify(prev_organizer_map)) 
+        onsubmit.formData.set('tags', JSON.stringify([online ? "online" : "offline", tag]))
 
         return async ({ result }) => {
             loading(false);
@@ -257,6 +272,11 @@
             }
         };
     }
+    let new_tag = ""
+
+    function addTag() {
+        tag = new_tag
+    }
 </script>
 
 <main>
@@ -289,6 +309,37 @@
             <span>
                 <p>Background Image</p>
                 <input name="image_url" type="text" value={event.image_url} />
+            </span>
+            <span>
+                <p>Tags</p>
+                {#if tag != ""}
+                    <button disabled>{tag}</button>
+                {/if}
+                <input name="image_url" type="text" bind:value={new_tag} />
+                <button type="button" on:click={addTag}>Update Tag</button>
+            </span>
+            <span class="isTeam">
+                <p>Online: </p>
+                <div style="display: flex;flex-direction:column">
+                    <label>
+                        <input
+                            name="online"
+                            type="radio"
+                            value="true"
+                            checked={online === true}
+                        />
+                        True
+                    </label>
+                    <label>
+                        <input
+                            name="online"
+                            type="radio"
+                            value="false"
+                            checked={online === false}
+                        />
+                        False
+                    </label>
+                </div>
             </span>
             <input hidden name="type" value={data.type} />
             <span class="isTeam">
@@ -386,6 +437,9 @@
         position: relative;
         top: 0;
         left: 0;
+    }
+    button {
+        cursor: pointer;
     }
     .update_Area {
         padding: 10px;

@@ -297,18 +297,18 @@ export const pre_components = [
         background-repeat: no-repeat;
     }
     h2 {
-        font-family: var(--pfont);
-        margin-left: 1rem;
-        width: max-content;
-        /* color: black; */
+        font-family: var(--pfont) !important;
+        overflow: hidden;
+        width: 100% !important;
+        text-overflow: clip;
+        word-wrap: break-word;
+        font-weight: 700;
     }
     p {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         letter-spacing: 0.05em;
         margin: 1rem;
-        margin-top: -0.5rem;
         overflow: hidden;
-        width: fit-content;
         text-align: center;
         border-radius: 0 0 0.4em 0.4em;
     }
@@ -347,6 +347,12 @@ export const pre_components = [
         display: flex;
         flex-direction: column;
         align-items: center;
+        margin: 10px;
+        text-align: center;
+    }
+    p {
+        margin: 10px;
+        text-align: center;
     }
 </style>`
     }

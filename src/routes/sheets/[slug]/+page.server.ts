@@ -1,5 +1,5 @@
 // import { password, newP } from '$lib/index.server';
-import type { Data, Payment, transaction, Vtransaction } from '$lib/types';
+import type { Data, Vtransaction } from '$lib/types';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { backend_url, POST } from '$lib';
