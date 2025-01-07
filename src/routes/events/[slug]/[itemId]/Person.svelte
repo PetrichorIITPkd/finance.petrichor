@@ -39,7 +39,7 @@
                     console.log("image fetch error: ", err.toString());
                 });
             } else {
-                url = `${origin}/uploads/${name.toLowerCase()}.png`;
+                url = `${origin}/uploads/${name.toLowerCase()}.webp`;
             }
         } else {
             url = "https://picsum.photos/200/300"

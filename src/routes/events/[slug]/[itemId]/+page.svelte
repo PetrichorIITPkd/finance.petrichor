@@ -136,6 +136,10 @@
 				background-size: cover;
 				background-image: url(${event.image_url});
 			}
+            h2,h3 {
+                font-family: var(--sfont) !important;
+                text-align: center;
+            }
 			.content {
 				z-index: 1;
 				padding-top: 5.5em;
@@ -165,12 +169,20 @@
 			}
 			@media (max-width:600px) {
 				.content {
-				z-index: 1;
-				padding-top: 2em;
-				margin: 0;
-				padding-left: 0;
-			}
-		}
+                    z-index: 1;
+                    padding-top: 2em;
+                    margin: 0;
+                    padding-left: 0;
+                }
+                h1 {
+                    font-size: 30px;
+                }
+            }
+			@media (max-width:440px) {
+                h1 {
+                    font-size: 25px;
+                }
+            }
         </style>
         </head>
         <body>

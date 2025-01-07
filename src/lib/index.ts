@@ -1,8 +1,9 @@
 import type { Data, Vtransaction } from "./types"
-
+import dotenv from "dotenv"
+dotenv.config() 
 // export const backend_url = "http://127.0.0.1:8000/"
-export const backend_url = 'https://petri-back.vercel.app/'
-// export const backend_url = 'https://petrichor-backend.vercel.app/'
+// export const backend_url = 'https://petri-back.vercel.app/'
+export const backend_url = 'https://petrichor-backend.vercel.app/'
 
 export let API = {
     addEvent: `${backend_url}internal/events/add/`,
@@ -251,7 +252,7 @@ export const pre_components = [
                     console.log("image fetch error: ", err.toString());
                 });
             } else {
-                url = \`\${origin}/uploads/\${name.toLowerCase()}.png\`;
+                url = \`\${origin}/uploads/\${name.toLowerCase()}.webp\`;
             }
         } else {
             url = "https://picsum.photos/200/300" 
@@ -414,6 +415,9 @@ export const pre_components = [
 			margin-bottom: 1em;
 			text-align: center;
 		}
+        .buttons {
+            margin: 0px;
+        }
 	}
 </style>
 

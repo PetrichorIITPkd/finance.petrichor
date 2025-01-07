@@ -8,8 +8,9 @@ export const load: PageServerLoad = async ({ params }) => {
 	if (params.slug != process.env.pass){
         throw error(404, {message: 'Wrong Password'})
     }
+    // console.log(process.env.backend_pass)
 	const res = await POST(API.allEvents,{
-        "password":process.env.pass
+        "password":process.env.backend_pass
     })
     const result = await res.json()
     if (result.status != 200){

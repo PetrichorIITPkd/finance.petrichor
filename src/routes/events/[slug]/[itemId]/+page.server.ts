@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
         const res = await POST(API.nextEventid, {
             "type": event_type,
             // "password": "Petrichor" 
-            "password": process.env.pass
+            "password": process.env.backend_pass
         })
         const result = await res.json()
         if (result.status != 200) {
@@ -39,7 +39,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
     const res = await POST(API.getEvent, {
         "id": params.itemId,
         // "password": "Petrichor" 
-        "password": process.env.pass
+        "password": process.env.backend_pass
     })
     const result = await res.json()
 
@@ -248,7 +248,7 @@ export const actions = {
             "image_url": image_url,
             "organizers": organizers_buffer.entries().toArray(),
             // "password" : "Petrichor"
-            "password": process.env.pass
+            "password": process.env.backend_pass
         })
             .then(res => res.json())
             .catch(err => {
