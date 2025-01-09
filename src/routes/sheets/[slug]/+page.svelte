@@ -29,6 +29,67 @@
         PopUpObj.isOn = true;
         return;
     };
+
+    // Function to download the dictionary as a JSON file
+    function downloadCSV() {
+        // Convert the dictionary to JSON string
+        // const jsonString = JSON.stringify(myDict, null, 2);
+
+        // Extract headers (keys) and values (rows) from the dictionary
+        let headers = ""; // "name,age,city"
+        if (["Unverified", "Verified"].includes(state)) {
+                headers = "Event Name, user_name, email, amount expected, CACode, number of participants,verified"
+            } else {
+                headers = "user_name, email, amount expected, CACode, number of participants,verified,registered by, participants"
+            }
+        let data = []
+        if (state == "Verified") {
+            data = verifiedPayments
+        } else if ( state == "Unverified") {
+            data = unverifiedPayments
+        } else {
+            data = eventData[state]
+        }
+
+        const values = data.map((e)=>{
+            if (["Unverified", "Verified"].includes(state)) {
+                return Object.values(e).join(",");
+            } else {
+                let final_row =  Object.values(e.payment);
+                for (const member of e.members) {
+                    final_row.push(`${member.name};${member.email};${member.phone}`)
+                }
+                return final_row.join(",")
+            }
+        })
+
+        // Combine headers and values into CSV format
+        const csvString = `${headers}\n${values.join('\n')}`;
+
+        // Create a Blob with the JSON data
+        const blob = new Blob([csvString], { type: "text/csv" });
+
+        // Create a URL for the Blob
+        const url = URL.createObjectURL(blob);
+
+        // Create a link element
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${state}.csv`
+
+        // Append to the body (necessary for Firefox)
+        document.body.appendChild(a);
+
+        // Programmatically click the link to trigger the download
+        a.click();
+
+        // Remove the link from the document
+        document.body.removeChild(a);
+
+        // Revoke the Blob URL to free up resources
+        URL.revokeObjectURL(url);
+    }
+
 </script>
 
 
@@ -99,10 +160,10 @@
             <option value={e}>{e}</option>
         {/each}
     </select>
-
+    <button on:click={downloadCSV} >Download CSV</button>
     <h1>{state}</h1>
     <div class="tb">
-        {#if state == "Verified"}
+        {#if state == "Verified"} 
             <table>
                 <tr>
                     <th>Event</th>
@@ -113,14 +174,16 @@
                     <th>Total Amount</th>
                 </tr>
                 {#each verifiedPayments as payment}
-                    <tr>
-                        <td>{payment.event}</td>
-                        <td>{payment.name}</td>
-                        <td>{payment.CA}</td>
-                        <td>{payment.transId}</td>
-                        <td>{payment.parts}</td>
-                        <td>{payment.amount}</td>
-                    </tr>
+                    {#if payment.amount != null}
+                        <tr>
+                            <td>{payment.event}</td>
+                            <td>{payment.name}</td>
+                            <td>{payment.CA}</td>
+                            <td>{payment.transId}</td>
+                            <td>{payment.parts}</td>
+                            <td>{payment.amount}</td>
+                        </tr>
+                    {/if}
                 {/each}
             </table>
         {:else if state == "Unverified"}
