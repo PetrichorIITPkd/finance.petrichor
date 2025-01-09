@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { enhance } from "$app/forms";
     import Loading from "$lib/components/Loading.svelte";
     import PopUpBox from "$lib/components/PopUpBox.svelte";
     import { backend_url, POST, reloadData } from "$lib/index";
@@ -12,6 +13,7 @@
     let verifiedPayments: Vtransaction[] = data.verified;
     let unverifiedPayments: Vtransaction[] = data.unverified;
     let verified: string[] = [];
+    let deleted: string[] = [];
     let consol = "";
     let loading = true;
     onMount(() => {
@@ -30,6 +32,81 @@
         return;
     };
 
+    const handleunverifyres = (onsubmit: {
+        [x: string]: any;
+        cancel: () => void;
+    }) => {
+        if (
+            !confirm(
+                "Do you really really want to submit. This is irreversible.\nParticipants will get an email regarding this immediately",
+            )
+        ) {
+            onsubmit.cancel();
+            return;
+        }
+        onsubmit.formData.set("deleted", JSON.stringify(deleted));
+        loading = true;
+        return async ({ result }) => {
+            loading = false;
+            if (result.type == "success" && result.data) {
+                const result_data = result.data;
+                alert(`Transaction Ids unverified and mail has been sent. \n\
+                    Total requests sent : ${deleted.length}\n\
+                    requests : ${deleted}\n\
+                    No of trasactions, server failed to unverify = ${result_data.failed_transactions.length};\n\
+                    Those transactions are: ${result_data.failed_transactions}`);
+                //!result_data.success => failed trs[]
+                const res = await reloadData();
+                verifiedPayments = res.verified;
+                unverifiedPayments = res.unverified;
+                eventData = res.data;
+                // console.log(eventData);
+                // consol += `${v} verified\n`;
+            } else {
+                console.log(result);
+            }
+            loading = false;
+        };
+    };
+
+    const handleverifyres = (onsubmit: {
+        [x: string]: any;
+        cancel: () => void;
+    }) => {
+        if (
+            !confirm(
+                "Do you really really want to submit. This is irreversible.\nParticipants will get an email regarding their verification in the events immediately",
+            )
+        ) {
+            onsubmit.cancel();
+            return;
+        }
+        onsubmit.formData.set("verified", JSON.stringify(verified));
+        loading = true;
+        return async ({ result }) => {
+            // console.log("result", result)
+            loading = false;
+            if (result.type == "success" && result.data) {
+                const result_data = result.data;
+                alert(`Transaction Ids verified and mail has been sent. \n\
+                            Total requests sent : ${verified.length}\n\
+                            requests : ${verified}\n\
+                            No of trasactions, server failed to verify = ${result_data.failed_transactions.length};\n\
+                            Those transactions are: ${result_data.failed_transactions}`);
+                //!result_data.success => failed trs[]
+                const res = await reloadData();
+                verifiedPayments = res.verified;
+                unverifiedPayments = res.unverified;
+                eventData = res.data;
+                // console.log(eventData);
+                // consol += `${v} verified\n`;
+            } else {
+                console.log("stat",result);
+            }
+            console.log(result)
+        };
+    };
+
     // Function to download the dictionary as a JSON file
     function downloadCSV() {
         // Convert the dictionary to JSON string
@@ -38,33 +115,37 @@
         // Extract headers (keys) and values (rows) from the dictionary
         let headers = ""; // "name,age,city"
         if (["Unverified", "Verified"].includes(state)) {
-                headers = "Event Name, user_name, email, amount expected, CACode, number of participants,verified"
-            } else {
-                headers = "user_name, email, amount expected, CACode, number of participants,verified,registered by, participants"
-            }
-        let data = []
-        if (state == "Verified") {
-            data = verifiedPayments
-        } else if ( state == "Unverified") {
-            data = unverifiedPayments
+            headers =
+                "Event Name, user_name, email, amount expected, CACode, number of participants,verified";
         } else {
-            data = eventData[state]
+            headers =
+                "user_name, email, amount expected, CACode, number of participants,verified,registered by, participants";
+        }
+        let data = [];
+        if (state == "Verified") {
+            data = verifiedPayments;
+        } else if (state == "Unverified") {
+            data = unverifiedPayments;
+        } else {
+            data = eventData[state];
         }
 
-        const values = data.map((e)=>{
+        const values = data.map((e) => {
             if (["Unverified", "Verified"].includes(state)) {
                 return Object.values(e).join(",");
             } else {
-                let final_row =  Object.values(e.payment);
+                let final_row = Object.values(e.payment);
                 for (const member of e.members) {
-                    final_row.push(`${member.name};${member.email};${member.phone}`)
+                    final_row.push(
+                        `${member.name};${member.email};${member.phone}`,
+                    );
                 }
-                return final_row.join(",")
+                return final_row.join(",");
             }
-        })
+        });
 
         // Combine headers and values into CSV format
-        const csvString = `${headers}\n${values.join('\n')}`;
+        const csvString = `${headers}\n${values.join("\n")}`;
 
         // Create a Blob with the JSON data
         const blob = new Blob([csvString], { type: "text/csv" });
@@ -75,7 +156,7 @@
         // Create a link element
         const a = document.createElement("a");
         a.href = url;
-        a.download = `${state}.csv`
+        a.download = `${state}.csv`;
 
         // Append to the body (necessary for Firefox)
         document.body.appendChild(a);
@@ -89,13 +170,11 @@
         // Revoke the Blob URL to free up resources
         URL.revokeObjectURL(url);
     }
-
 </script>
 
-
 <!-- <textarea value={consol}></textarea> -->
-
-<!-- <div class="gradient-bg">
+<!-- 
+<div class="gradient-bg">
     <div class="gradients-container extra">
         <div id="g1-3_1" class="g" />
         <div id="g1-2_1" class="g" />
@@ -106,52 +185,14 @@
 
 <div class="main">
     {#if verified.length > 0}
-        <button
-            class="submit"
-            on:click={() => {
-                consol = "";
-                if (
-                    !confirm(
-                        "Do you really really want to submit. This is irreversible.\nParticipants will get an email regarding their verification in the events immediately",
-                    )
-                ) {
-                    return;
-                }
-                loading = true;
-    
-                // verified.forEach(async (v) => {
-                POST(`${backend_url}internal/verifyTR/`, {
-                    transaction_ids: verified,
-                })
-                    .then((res) => res.json())
-                    .then(async (result) => {
-                        if (result.status == 200) {
-                            //result.succes
-                            alert(`Transaction Ids verified and mail has been sent. \n\
-                            Total requests sent : ${verified.length}\n\
-                            requests : ${verified}\n\
-                            No of trasactions, server failed to verify = ${result.failed_transactions.length};\n\
-                            Those transactions are: ${result.failed_transactions}`);
-                            //!result.success => failed trs[]
-                            const res = await reloadData();
-                            verifiedPayments = res.verified;
-                            unverifiedPayments = res.unverified;
-                            eventData = res.data;
-                            console.log(eventData);
-                            // consol += `${v} verified\n`;
-                        } else if (result.status == 404) {
-                            // consol += `${v} failed\n`;
-                        }
-                        loading = false;
-                        // console.log(result);
-                    })
-                    .catch((err) => {
-                        loading = false;
-                        console.log(err);
-                    });
-                // });
-            }}>Submit</button
-        >
+        <form action="?/verify" method="post" use:enhance={handleverifyres}>
+            <button class="submit">Verify</button>
+        </form>
+    {/if}
+    {#if deleted.length > 0}
+        <form action="?/unverify" method="post" use:enhance={handleunverifyres}>
+            <button class="submit">Delete</button>
+        </form>
     {/if}
     <select on:change={handleChange}>
         <option value="Unverified">Unverified</option>
@@ -160,10 +201,10 @@
             <option value={e}>{e}</option>
         {/each}
     </select>
-    <button on:click={downloadCSV} >Download CSV</button>
+    <button on:click={downloadCSV}>Download CSV</button>
     <h1>{state}</h1>
     <div class="tb">
-        {#if state == "Verified"} 
+        {#if state == "Verified"}
             <table>
                 <tr>
                     <th>Event</th>
@@ -196,6 +237,7 @@
                     <th>No. of Participants</th>
                     <th>Total Amount</th>
                     <th>Verified</th>
+                    <th>Delete</th>
                 </tr>
                 {#each unverifiedPayments as payment}
                     <tr>
@@ -216,6 +258,22 @@
                                         verified = verified;
                                     } else {
                                         verified = verified.filter(
+                                            (v) => v != payment.transId,
+                                        );
+                                    }
+                                }}
+                            /></td
+                        >
+                        <td
+                            ><input
+                                type="checkbox"
+                                on:change={(e) => {
+                                    // @ts-ignore
+                                    if (e?.target?.checked) {
+                                        deleted.push(payment.transId);
+                                        deleted = deleted;
+                                    } else {
+                                        deleted = deleted.filter(
                                             (v) => v != payment.transId,
                                         );
                                     }
@@ -282,11 +340,11 @@
 {/if}
 
 <style>
-    .main{
+    .main {
         z-index: 2;
         position: relative;
     }
-    select{
+    select {
         padding: 10px;
         background-color: rgba(191, 248, 248, 0.499);
     }
