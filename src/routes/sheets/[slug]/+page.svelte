@@ -51,16 +51,18 @@
             if (result.type == "success" && result.data) {
                 const result_data = result.data;
                 alert(`Transaction Ids unverified and mail has been sent. \n\
-                    Total requests sent : ${deleted.length}\n\
-                    requests : ${deleted}\n\
-                    No of trasactions, server failed to unverify = ${result_data.failed_transactions.length};\n\
-                    Those transactions are: ${result_data.failed_transactions}`);
+        Total requests sent : ${deleted.length}\n\
+        requests : 
+\t\t${deleted.join('\n\t\t')}\n\
+        No of trasactions, server failed to unverify = ${result_data.failed_transactions.length};\n\
+        Those transactions are: 
+\t\t${result_data.failed_transactions.join('\n\t\t')}`);
                 //!result_data.success => failed trs[]
                 const res = await reloadData();
                 verifiedPayments = res.verified;
                 unverifiedPayments = res.unverified;
                 eventData = res.data;
-                // console.log(eventData);
+                window.location.reload()
                 // consol += `${v} verified\n`;
             } else {
                 console.log(result);
@@ -89,15 +91,18 @@
             if (result.type == "success" && result.data) {
                 const result_data = result.data;
                 alert(`Transaction Ids verified and mail has been sent. \n\
-                            Total requests sent : ${verified.length}\n\
-                            requests : ${verified}\n\
-                            No of trasactions, server failed to verify = ${result_data.failed_transactions.length};\n\
-                            Those transactions are: ${result_data.failed_transactions}`);
+        Total requests sent : ${verified.length}\n\
+        requests : 
+\t\t${verified.join('\n\t\t')}\n\
+        No of trasactions, server failed to verify = ${result_data.failed_transactions.length};\n\
+        Those transactions are:
+\t\t${result_data.failed_transactions.join('\n\t\t')}`);
                 //!result_data.success => failed trs[]
                 const res = await reloadData();
                 verifiedPayments = res.verified;
                 unverifiedPayments = res.unverified;
                 eventData = res.data;
+                window.location.reload()
                 // console.log(eventData);
                 // consol += `${v} verified\n`;
             } else {
