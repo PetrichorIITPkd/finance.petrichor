@@ -7,15 +7,22 @@
     let userData: userData = data.data;
     let loading = true;
     let state = "All"
+    let user_type = false
     let CADataLen = 0;
+    let unverified_len= 0;
     onMount(() => {
         CADataLen = userData.filter((e) => {
+            if (!e.verified) {
+                unverified_len +=1
+            }
             if (e.CA != ""){
                 return e
             }
         }).length
         loading = false;
     });
+
+    
 
      // Function to download the dictionary as a JSON file
      function downloadCSV() {
@@ -75,10 +82,16 @@
         <option value="All">All</option>
         <option value="Only CA">Only CA</option>
     </select>
+    {#if state == "All"}
+    <div>
+        <label>Unverified</label>
+        <input type="checkbox" on:input={(e) => {user_type = !user_type}}>
+    </div>
+    {/if}
     <button on:click={downloadCSV} >Download CSV</button>
     
     <div class="tb">
-            Count : {state == "All" ? userData.length : CADataLen}
+            Count : {state == "All" ? user_type ? unverified_len :  userData.length : CADataLen}
             <table>
                 <tr>
                     <th>Name</th>
@@ -90,9 +103,10 @@
                     <th>CACode</th>
                     <th>CAregistrations</th>
                     <th>joined</th>
+                    <th>Verified</th>
                 </tr>
                 {#each userData as user}
-                    {#if (state == "Only CA" && user.CA != "") || (state == "All")}
+                    {#if ((state == "Only CA" && user.CA != "") || (state == "All" && (!user_type || (!user.verified))))     }
                     <tr>
                         <td>{user.name}</td>
                         <td>{user.email}</td>
@@ -103,6 +117,7 @@
                         <td>{user.CA}</td>
                         <td>{user.CAregistrations}</td>
                         <td>{user.joined}</td>
+                        <td>{user.verified}</td>
                     </tr>
                     {/if}
                 {/each}

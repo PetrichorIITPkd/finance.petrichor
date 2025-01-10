@@ -47,6 +47,7 @@ export type User = {
     email:string,
     gradyear:number,
     stream:string,
+    verified: boolean,
     CA:string,
     CAregistrations:string,
     joined:string,
