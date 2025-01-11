@@ -62,12 +62,13 @@
                 verifiedPayments = res.verified;
                 unverifiedPayments = res.unverified;
                 eventData = res.data;
-                window.location.reload()
                 // consol += `${v} verified\n`;
             } else {
                 console.log(result);
+                alert(result)
             }
-            loading = false;
+            window.location.reload()
+            // loading = false;
         };
     };
 
@@ -102,13 +103,14 @@
                 verifiedPayments = res.verified;
                 unverifiedPayments = res.unverified;
                 eventData = res.data;
-                window.location.reload()
                 // console.log(eventData);
                 // consol += `${v} verified\n`;
             } else {
                 console.log("stat",result);
+                alert(result)
             }
-            console.log(result)
+            window.location.reload()
+            // console.log(result)
         };
     };
 

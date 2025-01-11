@@ -37,48 +37,103 @@ export const actions = {
         const formData = await request.formData()
         let verified = JSON.parse(formData.get('verified'))
 
-        return await POST(`${backend_url}internal/verifyTR/`, {
-            transaction_ids: verified,
-            password: process.env.backend_pass,
-        })
-            .then((res) => res.json())
-            .then(async (result) => {
-                // console.log(result)
-                if (result.status == 200) {
-                    //result.success
-                    return result
-                } else if (result.status == 404) {
-                    return result
+        let i = 0
+        let len = verified.length;
+        let result_promises = []
+
+        while (i < len) {
+            let to_send = []
+            let max_val = Math.min(i + 5, len)
+            for (let j = i; j < max_val; j++) {
+                to_send.push(verified[j])
+            }
+            result_promises.push(
+                POST(`${backend_url}internal/verifyTR/`, {
+                    transaction_ids: to_send,
+                    password: process.env.backend_pass,
+                })
+                    .then((res) => res.json())
+                    .then(async (result) => {
+                        // console.log(result)
+                        return result
+                    })
+                    .catch((err) => {
+                        console.log("err", err);
+                        return {status: 400, "message": err.toString()}
+                    }));
+            i += 5
+        }
+        return await Promise.all(result_promises).then(results => {
+            let i = 0;
+            let failed_transactions: string[] = []
+            for (const res of results) {
+                if (res.status == 200) {
+                    failed_transactions = [...failed_transactions, ...res.failed_transactions]
+                } else {
+                    console.log("unsuccessful: ", res, i)
+                    let max_val = Math.min(i + 5, len)
+                    for (let j = i; j < max_val; j++) {
+                        failed_transactions.push(`${verified[j]}: failed response- ${res.toString()}`)
+                    }
                 }
-            })
-            .catch((err) => {
-                console.log("err",err);
-                return fail(404,{ status: 404, "message": err.toString() })
-            });
+                i+= 5
+            }
+            return {"success": true, "failed_transactions" : failed_transactions}
+        }).catch(err => {
+            console.log(err.toString())
+            return fail(400, {message: `Error: ${err.toString()}`})
+        })
+
     },
     unverify: async ({ request }) => {
         const formData = await request.formData()
         let deleted = JSON.parse(formData.get('deleted'))
         // return
+        let i = 0
+        let len = deleted.length;
+        let result_promises = []
 
-        return await POST(`${backend_url}internal/unverifyTR/`, {
-            transaction_ids: deleted,
-            password: process.env.backend_pass,
-        })
-            .then((res) => res.json())
-            .then(async (result) => {
-                // console.log(result);
-                if (result.status == 200) {
-                    //result.succes
-                    return result
-                } else if (result.status == 404) {
-                    // consol += `${v} failed\n`;
-                    return result
+        while (i < len) {
+            let to_send = []
+            let max_val = Math.min(i + 5, len)
+            for (let j = i; j < max_val; j++) {
+                to_send.push(deleted[j])
+            }
+            result_promises.push(
+                POST(`${backend_url}internal/unverifyTR/`, {
+                    transaction_ids: to_send,
+                    password: process.env.backend_pass,
+                })
+                    .then((res) => res.json())
+                    .then(async (result) => {
+                        // console.log(result)
+                        return result
+                    })
+                    .catch((err) => {
+                        console.log("err", err);
+                        return {status: 400, "message": err.toString()}
+                    }));
+            i += 5
+        }
+        return await Promise.all(result_promises).then(results => {
+            let i = 0;
+            let failed_transactions: string[] = []
+            for (const res of results) {
+                if (res.status == 200) {
+                    failed_transactions = [...failed_transactions, ...res.failed_transactions]
+                } else {
+                    console.log("unsuccessful: ", res, i)
+                    let max_val = Math.min(i + 5, len)
+                    for (let j = i; j < max_val; j++) {
+                        failed_transactions.push(`${deleted[j]}: failed response- ${res.toString()}`)
+                    }
                 }
-            })
-            .catch((err) => {
-                console.log("err",err);
-                return fail(404,{ status: 404, "message": err.toString() })
-            });
+                i+= 5
+            }
+            return {"success": true, "failed_transactions" : failed_transactions}
+        }).catch(err => {
+            console.log(err.toString())
+            return fail(400, {message: `Error: ${err.toString()}`})
+        })
     }
 } satisfies Actions;
