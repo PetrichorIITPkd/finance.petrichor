@@ -40,10 +40,12 @@ export const actions = {
         let i = 0
         let len = verified.length;
         let result_promises = []
+        let at_a_time = 3
+
 
         while (i < len) {
             let to_send = []
-            let max_val = Math.min(i + 5, len)
+            let max_val = Math.min(i + at_a_time, len)
             for (let j = i; j < max_val; j++) {
                 to_send.push(verified[j])
             }
@@ -61,7 +63,7 @@ export const actions = {
                         console.log("err", err);
                         return {status: 400, "message": err.toString()}
                     }));
-            i += 5
+            i += at_a_time
         }
         return await Promise.all(result_promises).then(results => {
             let i = 0;
@@ -71,12 +73,12 @@ export const actions = {
                     failed_transactions = [...failed_transactions, ...res.failed_transactions]
                 } else {
                     console.log("unsuccessful: ", res, i)
-                    let max_val = Math.min(i + 5, len)
+                    let max_val = Math.min(i + at_a_time, len)
                     for (let j = i; j < max_val; j++) {
                         failed_transactions.push(`${verified[j]}: failed response- ${res.toString()}`)
                     }
                 }
-                i+= 5
+                i+= at_a_time
             }
             return {"success": true, "failed_transactions" : failed_transactions}
         }).catch(err => {
@@ -92,10 +94,11 @@ export const actions = {
         let i = 0
         let len = deleted.length;
         let result_promises = []
+        let at_a_time = 3
 
         while (i < len) {
             let to_send = []
-            let max_val = Math.min(i + 5, len)
+            let max_val = Math.min(i + at_a_time, len)
             for (let j = i; j < max_val; j++) {
                 to_send.push(deleted[j])
             }
@@ -113,7 +116,7 @@ export const actions = {
                         console.log("err", err);
                         return {status: 400, "message": err.toString()}
                     }));
-            i += 5
+            i += at_a_time
         }
         return await Promise.all(result_promises).then(results => {
             let i = 0;
@@ -123,12 +126,12 @@ export const actions = {
                     failed_transactions = [...failed_transactions, ...res.failed_transactions]
                 } else {
                     console.log("unsuccessful: ", res, i)
-                    let max_val = Math.min(i + 5, len)
+                    let max_val = Math.min(i + at_a_time, len)
                     for (let j = i; j < max_val; j++) {
                         failed_transactions.push(`${deleted[j]}: failed response- ${res.toString()}`)
                     }
                 }
-                i+= 5
+                i+= at_a_time
             }
             return {"success": true, "failed_transactions" : failed_transactions}
         }).catch(err => {
