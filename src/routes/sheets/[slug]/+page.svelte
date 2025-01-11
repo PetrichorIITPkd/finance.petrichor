@@ -207,6 +207,7 @@
         {/each}
     </select>
     <button on:click={downloadCSV}>Download CSV</button>
+    <p>Count: {(state == "Verified") ? verifiedPayments.length : state == "Unverified" ? unverifiedPayments.length : eventData[state].length}</p>
     <h1>{state}</h1>
     <div class="tb">
         {#if state == "Verified"}
