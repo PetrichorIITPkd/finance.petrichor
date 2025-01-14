@@ -123,10 +123,10 @@
         let headers = ""; // "name,age,city"
         if (["Unverified", "Verified"].includes(state)) {
             headers =
-                "Event Name, user_name, email, amount expected, CACode, number of participants,verified";
+                "Event Name, user_name, transaction Id, amount expected, CACode, number of participants,verified, coupon";
         } else {
             headers =
-                "user_name, email, amount expected, CACode, number of participants,verified,registered by, participants";
+                "user_name, Transaction Id, amount expected, CACode, number of participants,verified, coupon,registered by, participants";
         }
         let data = [];
         if (state == "Verified") {
@@ -218,6 +218,7 @@
                     <th>Event</th>
                     <th>Name</th>
                     <th>CACode</th>
+                    <th>Coupon</th>
                     <th>Transaction ID</th>
                     <th>No. of Participants</th>
                     <th>Total Amount</th>
@@ -228,6 +229,7 @@
                             <td>{payment.event}</td>
                             <td>{payment.name}</td>
                             <td>{payment.CA}</td>
+                            <td>{payment.coupon}</td>
                             <td>{payment.transId}</td>
                             <td>{payment.parts}</td>
                             <td>{payment.amount}</td>
@@ -241,6 +243,7 @@
                     <th>Event</th>
                     <th>Name</th>
                     <th>CACode</th>
+                    <th>Coupon</th>
                     <th>Transaction ID</th>
                     <th>No. of Participants</th>
                     <th>Total Amount</th>
@@ -252,6 +255,7 @@
                         <td>{payment.event}</td>
                         <td>{payment.name}</td>
                         <td>{payment.CA}</td>
+                        <td>{payment.coupon}</td>
                         <td>{payment.transId}</td>
                         <td>{payment.parts}</td>
                         <td>{payment.amount}</td>
@@ -296,6 +300,7 @@
                 <tr>
                     <th>Name</th>
                     <th>CACode</th>
+                    <th>Coupon</th>
                     <th>Transaction ID</th>
                     <th>No. of Participants</th>
                     <th>Total Amount</th>
@@ -306,6 +311,7 @@
                     <tr>
                         <td>{d.payment.name}</td>
                         <td>{d.payment.CA}</td>
+                        <td>{d.payment.coupon}</td>
                         <td>{d.payment.transId}</td>
                         <td>{d.payment.parts}</td>
                         <td>{d.payment.amount}</td>

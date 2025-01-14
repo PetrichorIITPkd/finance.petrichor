@@ -3,6 +3,7 @@ export type Payment = {
     transId: string,
     amount: number,
     CA: string,
+    coupon: string,
     parts: number,
     verified: boolean
 }
@@ -13,6 +14,7 @@ export type Vtransaction = {
     transId: string,
     amount: number,
     CA: string,
+    coupon: string,
     parts: number,
     verified: boolean
 }
