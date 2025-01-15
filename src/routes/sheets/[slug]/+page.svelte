@@ -9,7 +9,7 @@
     export let data: any;
 
     let eventData: Data = data.data;
-    let eventList: string[] = Object.keys(eventData);
+    let eventList: string[] = Object.keys(eventData).sort();
     let verifiedPayments: Vtransaction[] = data.verified;
     let unverifiedPayments: Vtransaction[] = data.unverified;
     let verified: string[] = [];
