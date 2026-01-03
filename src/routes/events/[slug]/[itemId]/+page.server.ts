@@ -10,7 +10,7 @@ import type { PageServerLoad } from './$types';
 import { fail, error } from '@sveltejs/kit';
 
 // TODO Update year as needed
-const YEAR = 2026;
+const YEAR = process.env.YEAR || "2026";
 
 export const load: PageServerLoad = async ({ params, url }) => {
     if (params.slug != process.env.pass) {
