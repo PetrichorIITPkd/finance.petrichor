@@ -9,6 +9,9 @@ import { build } from 'esbuild';
 import type { PageServerLoad } from './$types';
 import { fail, error } from '@sveltejs/kit';
 
+// TODO Update year as needed
+const YEAR = 2026;
+
 export const load: PageServerLoad = async ({ params, url }) => {
     if (params.slug != process.env.pass) {
         throw error(404, { message: "Wrong Password" })
@@ -27,7 +30,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
         if (result.status != 200) {
             throw error(404, { message: 'Unable to resolve the response: ' + result.message })
         }
-        default_event.eventId = `${event_type?.at(0)}F${result.data.toString().padStart(2, '0')}`
+        // # TODO Update year as needed
+        default_event.eventId = `${event_type?.at(0)}F${result.data.toString().padStart(2, '0')}_${YEAR}`
         // default_event.markdown = fs.readFileSync(path.resolve('./src/routes/events/[slug]/[itemId]/_page.svx')).toString()
         return {
             "event": default_event,
