@@ -236,7 +236,7 @@ export const pre_components = [
                 origin == "http://localhost:5173"
             ) {
                 console.log("Fetching image", origin);
-                await fetch("https://petri-back.vercel.app/internal/image/", {
+                await fetch("https://petrichor-backend.vercel.app/internal/image/", {
                     method: "POST",
                     headers: {
                         "Content-type": "application/json",
